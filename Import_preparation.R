@@ -118,28 +118,28 @@ beach <- beach[!(beach$name1=="NA"),]
 beach <- select(beach, -name7:-sand_mouth10)
 
 follow <- follow |> 
-  unite(household_name, c("First name", "Last name"), sep=" ") |> 
+  unite(household_name, c("first_name", "last_name"), sep=" ") |> 
   unite(name, c("fname", "lname"), sep=" ") |> 
   unite(name1, c("name", "name2", "name3", "name4", "name5", "name6"), sep=",") |> 
   unite(rec_act1, c("rec_act", "rec_act2", "rec_act3", "rec_act4", "rec_act5", "rec_act6"), sep=",") |> 
-  unite(symptoms_diar, c("symptoms_diarrhea", "symptoms2_diarrhea", "symptoms3_diarrhea", "symptoms4_diarrhea", "symptoms5_diarrhea", "symptoms6_diarrhea"), sep=",") |> 
-  unite(symptoms_vomit, c("symptoms_vomiting", "symptoms2_vomiting", "symptoms3_vomiting", "symptoms4_vomiting", "symptoms5_vomiting", "symptoms6_vomiting"), sep=",") |> 
-  unite(symptoms_cramps, c("symptoms_cramps", "symptoms2_cramps", "symptoms3_cramps", "symptoms4_cramps", "symptoms5_cramps", "symptoms6_cramps"), sep=",") |> 
-  unite(symptoms_naus, c("symptoms_nausea", "symptoms2_nausea", "symptoms3_nausea", "symptoms4_nausea", "symptoms5_nausea", "symptoms6_nausea"), sep=",") |> 
-  unite(symptoms_fever, c("symptoms_fever", "symptoms2_fever", "symptoms3_fever", "symptoms4_fever", "symptoms5_fever", "symptoms6_fever"), sep=",") |> 
-  unite(symptoms_throat, c("symptoms_throat", "symptoms2_throat", "symptoms3_throat", "symptoms4_throat", "symptoms5_throat", "symptoms6_throat"), sep=",") |> 
-  unite(symptoms_nose, c("symptoms_nose", "symptoms2_nose", "symptoms3_nose", "symptoms4_nose", "symptoms5_nose", "symptoms6_nose"), sep=",") |> 
-  unite(symptoms_cough, c("symptoms_cough", "symptoms2_cough", "symptoms3_cough", "symptoms4_cough", "symptoms5_cough","symptoms6_cough"), sep=",") |> 
-  unite(symptoms_ear, c("symptoms_ear", "symptoms2_ear", "symptoms3_ear", "symptoms4_ear", "symptoms5_ear", "symptoms6_ear"), sep=",") |> 
-  unite(symptoms_eye, c("symptoms_eye", "symptoms2_eye", "symptoms3_eye", "symptoms4_eye", "symptoms5_eye", "symptoms6_eye"), sep=",") |> 
-  unite(symptoms_rash, c("symptoms_rash", "symptoms2_rash", "symptoms3_rash", "symptoms4_rash", "symptoms5_rash", "symptoms6_rash"), sep=",") |> 
-  unite(symptoms_none, c("symptoms_none", "symptoms2_none", "symptoms3_none", "symptoms4_none", "symptoms5_none", "symptoms6_none"), sep=",") |> 
+  unite(symptoms_diar, c("symptomsdiarrhea", "symptoms2diarrhea", "symptoms3diarrhea", "symptoms4diarrhea", "symptoms5diarrhea", "symptoms6diarrhea"), sep=",") |> 
+  unite(symptoms_vomit, c("symptomsvomiting", "symptoms2vomiting", "symptoms3vomiting", "symptoms4vomiting", "symptoms5vomiting", "symptoms6vomiting"), sep=",") |> 
+  unite(symptoms_cramps, c("symptomscramps", "symptoms2cramps", "symptoms3cramps", "symptoms4cramps", "symptoms5cramps", "symptoms6cramps"), sep=",") |> 
+  unite(symptoms_naus, c("symptomsnausea", "symptoms2nausea", "symptoms3nausea", "symptoms4nausea", "symptoms5nausea", "symptoms6nausea"), sep=",") |> 
+  unite(symptoms_fever, c("symptomsfever", "symptoms2fever", "symptoms3fever", "symptoms4fever", "symptoms5fever", "symptoms6fever"), sep=",") |> 
+  unite(symptoms_throat, c("symptomsthroat", "symptoms2throat", "symptoms3throat", "symptoms4throat", "symptoms5throat", "symptoms6throat"), sep=",") |> 
+  unite(symptoms_nose, c("symptomsnose", "symptoms2nose", "symptoms3nose", "symptoms4nose", "symptoms5nose", "symptoms6nose"), sep=",") |> 
+  unite(symptoms_cough, c("symptomscough", "symptoms2cough", "symptoms3cough", "symptoms4cough", "symptoms5cough","symptoms6cough"), sep=",") |> 
+  unite(symptoms_ear, c("symptomsear", "symptoms2ear", "symptoms3ear", "symptoms4ear", "symptoms5ear", "symptoms6ear"), sep=",") |> 
+  unite(symptoms_eye, c("symptomseye", "symptoms2eye", "symptoms3eye", "symptoms4eye", "symptoms5eye", "symptoms6eye"), sep=",") |> 
+  unite(symptoms_rash, c("symptomsrash", "symptoms2rash", "symptoms3rash", "symptoms4rash", "symptoms5rash", "symptoms6rash"), sep=",") |> 
+  unite(symptoms_none, c("symptomsnone", "symptoms2none", "symptoms3none", "symptoms4none", "symptoms5none", "symptoms6none"), sep=",") |> 
   unite(symp_date, c("symp_start", "symp_start2", "symp_start3", "symp_start4", "symp_start5","symp_start6"), sep=",") |> 
   unite(misswork, c("misswork", "misswork2", "misswork3", "misswork4", "misswork5", "misswork6"), sep=",") |> 
-  unite(misswork_days, c("misswork_1", "misswork2_1", "misswork3_1", "misswork4_1", "misswork5_1", "misswork6_1"), sep=",") |> 
-  unite(med_antibiotics, c("medication_antibiotics", "medication2_antibiotics", "medication3_antibiotics", "medication4_antibiotics", "medications5_antibiotics", "medication6_antibiotics"), sep=",") |> 
-  unite(med_otc, c("medication_otc_drugs", "medication2_otc_drugs", "medication3_otc_drugs", "medication4_otc_drugs", "medications5_otc_drugs", "medication6_otc_drugs"), sep=",") |> 
-  unite(med_none, c("medication_none", "medication2_none", "medication3_none", "medication4_none", "medications5_none", "medication6_none"), sep=",")  |> 
+  unite(misswork_days, c("misswork1", "misswork21", "misswork31", "misswork41", "misswork51", "misswork61"), sep=",") |> 
+  unite(med_antibiotics, c("medicationantibiotics", "medication2antibiotics", "medication3antibiotics", "medication4antibiotics", "medications5antibiotics", "medication6antibiotics"), sep=",") |> 
+  unite(med_otc, c("medicationotc_drugs", "medication2otc_drugs", "medication3otc_drugs", "medication4otc_drugs", "medications5otc_drugs", "medication6otc_drugs"), sep=",") |> 
+  unite(med_none, c("medicationnone", "medication2none", "medication3none", "medication4none", "medications5none", "medication6none"), sep=",")  |> 
   unite(healthcare1, c("healthcare", "healthcare2", "healthcare3", "healthcare4", "healthcare5", "healthcare6"), sep=",")  |>
   unite(blood_stool1, c("blood_stool", "blood_stool2", "blood_stool3", "blood_stool4", "blood_stool5", "blood_stool6"), sep=",")  |>
   unite(stool_test1, c("stool_test", "stool_test2", "stool_test3", "stool_test4", "stool_test5", "stool_test6"), sep=",")  |>
@@ -156,7 +156,7 @@ follow <- follow |>
                 emergency, hospital, others_follow, sep=",") 
 
 follow <- follow[!(follow$name1=="NA"),]
-
+follow <- select(follow, -name7:-hospitalized10)
 
 # Merge survey datasets
 
@@ -164,7 +164,7 @@ beach <- beach |>
   rename(house_id = internal_id) |> 
   rename(date = submitted_date) 
 
-survey_data <- left_join(beach_surveys, follow, by = "name1")
+survey_data <- left_join(beach, follow, by = "name1")
 
 
 # Check for duplicate names 
@@ -173,8 +173,8 @@ survey_data |> group_by(name1) |> filter(n()>1)
 
 ## Check for any follow-up participants that did not match to beach participants
 
-follow |> anti_join(beach_surveys, by = "name1")
-investigate <- follow |> anti_join(beach_surveys, by = "name1")
+follow |> anti_join(beach, by = "name1")
+investigate <- follow |> anti_join(beach, by = "name1")
 
 
 ## Merge E. coli data

@@ -27,7 +27,6 @@ data  <- data  |>
 data <- data |> 
   mutate(symp_date = as.Date(symp_date, format = "%Y-%m-%d"))
 
-
 # Create exposure and outcome variables of interest
 
 data <- data |> 
@@ -68,57 +67,47 @@ data <- data |>
 # Create 7-day outcome/illness variables 
 
 data <- data |> 
-  mutate(cramps_inc = symp_date-date) |> 
-  mutate(diar_inc = symp_date-date) |> 
-  mutate(vomit_inc = symp_date-date) |> 
-  mutate(naus_inc = symp_date-date) |> 
-  mutate(fever_inc = symp_date-date) |> 
-  mutate(throat_inc = symp_date-date) |> 
-  mutate(nose_inc = symp_date-date) |> 
-  mutate(cough_inc = symp_date-date) |> 
-  mutate(ear_inc = symp_date-date) |> 
-  mutate(eye_inc = symp_date-date) |> 
-  mutate(rash_inc = symp_date-date)
+  mutate(symp_inc = symp_date-date) 
 
 data <- data |> 
   mutate(agi = case_when(
-    (symptoms_diar == "diarrhea" & diar_inc <= 7) ~ 1,
-    (symptoms_vomit == "vomiting" & vomit_inc <= 7) ~ 1,
-    (symptoms_cramps == "cramps" & symptoms_naus == "nausea" & cramps_inc <=7 & naus_inc <= 7) ~ 1,
-    (symptoms_cramps == "cramps" & cramps_inc <=7 & misswork == 1) ~ 1,
-    (symptoms_naus == "nausea" & naus_inc <=7 & misswork == 1) ~ 1,
+    (symptoms_diar == "diarrhea" & symp_inc <=7) ~ 1,
+    (symptoms_vomit == "vomiting" & symp_inc <=7) ~ 1,
+    (symptoms_cramps == "cramps" & symptoms_naus == "nausea" & symp_inc <=7) ~ 1,
+    (symptoms_cramps == "cramps" & symp_inc <=7 & misswork == 1) ~ 1,
+    (symptoms_naus == "nausea" & symp_inc <=7 & misswork == 1) ~ 1,
     TRUE ~ 0)) |>
   mutate(agi = as.numeric(agi))
 
 data <- data |> 
   mutate(respiratory = case_when(
-    (symptoms_cough == "cough" & cough_inc <= 7) ~ 1,
-    (symptoms_fever == "fever" & symptoms_throat == "throat" & fever_inc <=7 & throat_inc <= 7) ~ 1,
-    (symptoms_fever == "fever" & symptoms_nose == "nose" & fever_inc <=7 & nose_inc <= 7) ~ 1,
+    (symptoms_cough == "cough" & symp_inc <=7) ~ 1,
+    (symptoms_fever == "fever" & symptoms_throat == "throat" & symp_inc <=7) ~ 1,
+    (symptoms_fever == "fever" & symptoms_nose == "nose" & symp_inc <=7) ~ 1,
     TRUE ~ 0)) |>
   mutate(respiratory = as.numeric(respiratory))
 
 data <- data |> 
   mutate(ear_infection = case_when(
-    (symptoms_ear == "ear" & ear_inc <= 7) ~ 1,
+    (symptoms_ear == "ear" & symp_inc <=7) ~ 1,
     TRUE ~ 0)) |>
   mutate(ear_infection = as.numeric(ear_infection))
 
 data <- data |> 
   mutate(eye_infection = case_when(
-    (symptoms_eye == "eye" & eye_inc <= 7) ~ 1,
+    (symptoms_eye == "eye" & symp_inc <=7) ~ 1,
     TRUE ~ 0)) |>
   mutate(eye_infection = as.numeric(eye_infection))
 
 data <- data |> 
   mutate(skin_infection = case_when(
-    (symptoms_rash == "rash" & rash_inc <= 7) ~ 1,
+    (symptoms_rash == "rash" & symp_inc <=7) ~ 1,
     TRUE ~ 0)) |>
   mutate(skin_infection = as.numeric(skin_infection))
 
 data <- data |> 
   mutate(diarrhea = case_when(
-    (symptoms_diar == "diarrhea" & diar_inc <= 7) ~ 1,
+    (symptoms_diar == "diarrhea" & symp_inc <=7) ~ 1,
     TRUE ~ 0)) |>
   mutate(diarrhea = as.numeric(diarrhea))
 

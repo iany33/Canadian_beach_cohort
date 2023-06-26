@@ -58,7 +58,7 @@ data |>
          water_act_wake, water_act_ski, water_act_paddle, water_act_snorkel, water_act_dive,
          water_act_wade, water_act_sail, water_act_boat, water_act_fish, water_act_canoe,
          water_act_kayak, water_act_other, water_exp_body, water_exp_head, water_exp_mouth, 
-         sand_contact, sand_act_dig, sand_act_bury, sand_mouth1) |> 
+         sand_contact, sand_mouth1, sand_act_dig, sand_act_bury) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1)))
 
 data |> 

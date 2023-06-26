@@ -1,0 +1,146 @@
+---
+title: "2023 Beach Cohort Study"
+author: "Ian Young"
+date: "`r Sys.Date()`"
+format: 
+  pdf
+editor: visual
+---
+
+```{r}
+#| echo: false
+pacman::p_load(
+  rio,
+  here,
+  tidyverse,
+  gtsummary,
+  rstatix, 
+  janitor, 
+  flextable
+)
+
+load("G:/My Drive/Research/Projects-TMU/Beach water illness/CIHR Bridge 2023-2024/Analysis_beach_cohort_study/.RData")
+```
+
+# Descriptive Summary
+
+```{r}
+#| echo: false
+num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
+num_participants <- data |> summarize(count = n())
+house_size <- round(num_participants/num_households, digits = 2)
+
+num_eligiblehouse_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
+  filter(follow_date >=7) |> select(house_id) |> n_distinct() |> as_tibble()
+num_eligible_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
+  filter(follow_date >=7) |> summarize(count = n())
+num_follow <- data |> filter(follow == "Yes") |> summarize(count = n())
+response_rate <- round(num_follow/num_eligible_follow*100, digits = 2)
+
+data_follow <- data |> filter(follow == "Yes") 
+```
+
+As of `r Sys.Date()`, we have recruited `r num_participants` individual participants from `r num_households` households (mean household size = `r house_size`). A summary of their responses is highlighted below.
+
+Among `r num_eligiblehouse_follow` households and `r num_eligible_follow` individual participants that have completed the beach survey 7 or more days ago (and have had an opportunity to complete the follow-up), the **individual participant response rate** is `r response_rate`%.
+
+## Sociodemographics
+
+```{r}
+#| echo: false
+data |> 
+  select(age1, gender, education2, residence, eth_arab, eth_black, 
+         eth_east_asian, eth_indigenous, eth_latin, eth_south_asian, 
+         eth_se_asian, eth_white, eth_other) |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## Baseline health and beach activities
+
+```{r}
+#| echo: false
+data |>
+  select(base_agi, base_resp, base_ear, base_eye, base_skin, cond_GI, cond_resp, cond_skin,
+         cond_allergy, cond_immune, cond_none, prev_act1, beach_exp_algae,
+         beach_exp_sunscreen, beach_exp_repellent, beach_exp_food) |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## Water and sand exposures
+
+```{r}
+#| echo: false
+data |> 
+  select(water_contact, water_act_swim, water_act_surf, water_act_kite, water_act_wind,
+         water_act_wake, water_act_ski, water_act_paddle, water_act_snorkel, water_act_dive,
+         water_act_wade, water_act_sail, water_act_boat, water_act_fish, water_act_canoe,
+         water_act_kayak, water_act_other, water_exp_body, water_exp_head, water_exp_mouth, 
+         sand_contact, sand_mouth1, sand_act_dig, sand_act_bury) |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## E. coli Levels by Recruitment Date
+
+```{r}
+#| echo: false
+#| warning: false
+data |>
+  ggplot(aes(x = date, y = e_coli)) +
+  geom_point(colour = "black") + 
+  geom_line(colour = "steelblue") + 
+  theme_minimal() +
+  labs(y = "E. coli geometric mean (CFU / 100 mL)", x = "Recruitment date")
+```
+
+## Illness Outcomes (Excluding those with Baseline Symptoms)
+
+```{r}
+#| echo: false
+data_follow |> 
+  select(agi3, diarrhea3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
+         misswork, med_antibiotics, med_otc, med_none, healthcare1, blood_stool1, 
+         stool_test1, emergency, hospital) |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## Outcomes by Water and Sand Exposure Status - excluding those with same outcomes at baseline
+
+```{r}
+#| echo: false
+data_follow |> 
+  select(agi3, diarrhea3, respiratory3, ear_infection3, eye_infection3, skin_infection3, 
+         water_contact) |> 
+  tbl_summary(by = water_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+```{r}
+#| echo: false
+data_follow |> 
+  select(agi3, diarrhea3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
+         sand_contact) |> 
+  tbl_summary(by = sand_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## Compare Sociodemographics of those who Completed Follow-up Survey vs. Not
+
+```{r}
+#| echo: false
+data |> mutate(follow_date = Sys.Date()-date) |> 
+  filter(follow_date >=7) |> 
+  select(age1, gender, education, residence, eth_arab, eth_black, eth_east_asian,
+         eth_indigenous, eth_latin, eth_south_asian, eth_se_asian, eth_white, base_agi,
+         base_resp, base_ear, base_eye, base_skin, cond_GI, cond_resp, cond_skin,
+         cond_allergy, cond_immune, cond_none, prev_act1, water_contact, water_act_swim,
+         water_act_wade, water_exp_body, water_exp_head, water_exp_mouth, sand_contact,
+         sand_act_dig, sand_act_bury, sand_mouth1, follow)  |> 
+  tbl_summary(by = follow, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+
