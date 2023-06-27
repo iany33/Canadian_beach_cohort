@@ -31,9 +31,9 @@ num_participants <- data |> summarize(count = n())
 house_size <- round(num_participants/num_households, digits = 2)
 
 num_eligiblehouse_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=7) |> select(house_id) |> n_distinct() |> as_tibble()
+  filter(follow_date >=9) |> select(house_id) |> n_distinct() |> as_tibble()
 num_eligible_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=7) |> summarize(count = n())
+  filter(follow_date >=9) |> summarize(count = n())
 num_follow <- data |> filter(follow == "Yes") |> summarize(count = n())
 response_rate <- round(num_follow/num_eligible_follow*100, digits = 2)
 
@@ -43,6 +43,17 @@ data_follow <- data |> filter(follow == "Yes")
 As of `r Sys.Date()`, we have recruited `r num_participants` individual participants from `r num_households` households (mean household size = `r house_size`). A summary of their responses is highlighted below.
 
 Among `r num_eligiblehouse_follow` households and `r num_eligible_follow` individual participants that have completed the beach survey 7 or more days ago (and have had an opportunity to complete the follow-up), the **individual participant response rate** is `r response_rate`%.
+
+### Recruitment Stats by Beach 
+
+```{r}
+#| echo: false
+data |> group_by(beach) |> select(beach, date, house_id) |> 
+   summarize(Num_households = n_distinct(house_id),
+             Num_participants = n(), 
+             Num_days = n_distinct(date),
+             Participants_per_day = round(Num_participants/Num_days, digits = 1))
+```
 
 ## Sociodemographics
 
@@ -143,4 +154,12 @@ data |> mutate(follow_date = Sys.Date()-date) |>
   as_flex_table() 
 ```
 
+## Follow-up Contact Preference
 
+```{r}
+#| echo: false
+data |> distinct(house_id, preference) |>
+  select(preference)  |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
