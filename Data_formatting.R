@@ -377,10 +377,13 @@ data <- data |>
     (eth_arab == "Yes" & (eth_south_asian == "Yes" | eth_se_asian == "Yes" | 
                              eth_east_asian == "Yes" | eth_black == "Yes" | 
                              eth_latin == "Yes" | eth_indigenous == "Yes")) ~ "Multiple ethnicities",
+    (eth_south_asian == "Yes" & (eth_se_asian == "Yes" | eth_east_asian == "Yes" | 
+                                   eth_black == "Yes" | eth_latin == "Yes" | 
+                                   eth_indigenous == "Yes")) ~ "Multiple ethnicities",    
     eth_white == "Yes" ~ "White",
+    eth_arab == "Yes" ~ "Arab",
     eth_south_asian == "Yes" ~ "South Asian",
     eth_se_asian == "Yes" ~ "Southeast Asian",
-    eth_arab == "Yes" ~ "Arab",
     eth_east_asian == "Yes" ~ "East Asian",
     eth_black == "Yes" ~ "Black",
     eth_latin == "Yes" ~ "Latin",
@@ -389,7 +392,6 @@ data <- data |>
 
 data |> tabyl(ethnicity)  
     
-
 # Create water sports and other minimal contact variables
 
 data <- data |> 

@@ -40,8 +40,8 @@ beach <- beach |>
   unite(ethnicity_south_asian, c("ethnicitysouth_asian", "ethnicity2south_asian", "ethnicity3south_asian", "ethnicity4south_asian", "ethnicity5south_asian", "ethnicity6south_asian"), sep=",") |> 
   unite(ethnicity_se_asian, c("ethnicitysoutheast_asian", "ethnicity2southeast_asian", "ethnicity3southeast_asian", "ethnicity4southeast_asian", "ethnicity5southeast_asian", "ethnicity6southeast_asian"), sep=",") |> 
   unite(ethnicity_white, c("ethnicitywhite", "ethnicity2white", "ethnicity3white", "ethnicity4white", "ethnicity5white", "ethnicity6white"), sep=",") |> 
-  unite(ethnicity_other, c("ethnicityother_eth_34", "ethnicity2other_eth_105", "ethnicity3other_eth_176", "ethnicity4other_eth_247", "ethnicity5other_eth_318", "ethnicity6other_eth_389"), sep=",") |> 
-  unite(ethnicity_other_s, c("ethnicityother_eth_35", "ethnicity2other_eth_106", "ethnicity3other_eth_177", "ethnicity4other_eth_248", "ethnicity5other_eth_319", "ethnicity6other_eth_390"), sep=",") |> 
+  unite(ethnicity_other, c("ethnicityother_eth_35", "ethnicity2other_eth_106", "ethnicity3other_eth_177", "ethnicity4other_eth_248", "ethnicity5other_eth_319", "ethnicity6other_eth_390"), sep=",") |> 
+  unite(ethnicity_other_s, c("ethnicityother_eth_36", "ethnicity2other_eth_107", "ethnicity3other_eth_178", "ethnicity4other_eth_249", "ethnicity5other_eth_320", "ethnicity6other_eth_391"), sep=",") |> 
   unite(ethnicity_na, c("ethnicity_na", "ethnicity2na", "ethnicity3na", "ethnicity4na", "ethnicity5na", "ethnicity6na"), sep=",") |> 
   unite(base_symp_diar, c("symptomsdiarrhea", "symptoms2diarrhea", "symptoms3diarrhea", "symptoms4diarrhea", "symptoms5diarrhea", "symptoms6diarrhea"), sep=",") |> 
   unite(base_symp_vomit, c("symptomsvomiting", "symptoms2vomiting", "symptoms3vomiting", "symptoms4vomiting", "symptoms5vomiting", "symptoms6vomiting"), sep=",") |> 
@@ -79,8 +79,8 @@ beach <- beach |>
   unite(water_act_fish, c("water_actfish", "water_act2fish", "water_act3fish", "water_act4fish", "water_act5fish", "water_act6fish"), sep=",") |> 
   unite(water_act_canoe, c("water_actcanoe", "water_act2canoe", "water_act3canoe", "water_act4canoe", "water_act5canoe", "water_act6canoe"), sep=",") |> 
   unite(water_act_kayak, c("water_actkayak", "water_act2kayak", "water_act3kayak", "water_act4kayak", "water_act5kayak", "water_act6kayak"), sep=",") |> 
-  unite(water_act_other, c("water_actother_73", "water_act2other_144", "water_act3other_215", "water_act4other_286", "water_act5other_357", "water_act6other_428"), sep=",") |>   
-  unite(water_act_other_s, c("water_actother_74", "water_act2other_145", "water_act3other_216", "water_act4other_287", "water_act5other_358", "water_act6other_429"), sep=",") |> 
+  unite(water_act_other, c("water_actother_74", "water_act2other_145", "water_act3other_216", "water_act4other_287", "water_act5other_358", "water_act6other_429"), sep=",") |>   
+  unite(water_act_other_s, c("water_actother_75", "water_act2other_146", "water_act3other_217", "water_act4other_288", "water_act5other_359", "water_act6other_430"), sep=",") |> 
   unite(water_exp_body, c("water_expface", "water_exp2face", "water_exp3face", "water_exp4face", "water_exp5face", "water_exp6face"), sep=",") |> 
   unite(water_exp_head, c("water_exphead", "water_exp2head", "water_exp3head", "water_exp4head", "water_exp5head", "water_exp6head"), sep=",") |> 
   unite(water_exp_mouth, c("water_expmouth", "water_exp2mouth", "water_exp3mouth", "water_exp4mouth", "water_exp5mouth", "water_exp6mouth"), sep=",") |> 
@@ -93,8 +93,8 @@ beach <- beach |>
   unite(sand1, c("sand", "sand2", "sand3", "sand4", "sand5", "sand6"), sep=",") |> 
   unite(sand_act_dig, c("sand_actdig", "sand_act2dig", "sand_act3dig", "sand_act4dig", "sand_act5dig", "sand_act6dig"), sep=",") |> 
   unite(sand_act_bury, c("sand_actbury", "sand_act2bury", "sand_act3bury", "sand_act4bury", "sand_act5bury", "sand_act6bury"), sep=",") |> 
-  unite(sand_act_other, c("sand_actother_88", "sand_act2other_159", "sand_act3other_230", "sand_act4other_301", "sand_act5other_372", "sand_act6other_443"), sep=",") |>   
-  unite(sand_act_other_s, c("sand_actother_89", "sand_act2other_160", "sand_act3other_231", "sand_act4other_302", "sand_act5other_373", "sand_act6other_444"), sep=",") |> 
+  unite(sand_act_other, c("sand_actother_89", "sand_act2other_160", "sand_act3other_231", "sand_act4other_302", "sand_act5other_373", "sand_act6other_444"), sep=",") |>   
+  unite(sand_act_other_s, c("sand_actother_90", "sand_act2other_161", "sand_act3other_232", "sand_act4other_303", "sand_act5other_374", "sand_act6other_445"), sep=",") |> 
   unite(sand_mouth1, c("sand_mouth", "sand_mouth2", "sand_mouth3", "sand_mouth4", "sand_mouth5", "sand_mouth6"), sep=",")  |> 
   unite(others, c("others", "others2", "others3", "others4", "others5", "others6"), sep=",")
 
@@ -162,33 +162,35 @@ follow <- select(follow, -name7:-hospitalized10)
 
 beach <- beach |> 
   rename(house_id = internal_id) |> 
-  rename(date = submitted_date) 
+  rename(date = accessed_date) 
 
 survey_data <- left_join(beach, follow, by = "name1")
-
-
-# Check for duplicate names 
-survey_data |> group_by(name1) |> filter(n()>1) 
-
-
-## Check for any follow-up participants that did not match to beach participants
-
-follow |> anti_join(beach, by = "name1")
-investigate <- follow |> anti_join(beach, by = "name1")
-
-
-## Merge E. coli data
-
-e_coli <- e_coli |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
 survey_data <- survey_data |> 
   mutate(date = as.Date(date))  |> 
   mutate(month = as.factor(month(date))) |> 
   mutate(dow = as.factor(wday(date))) # Sunday is 1, Sat. is 7
 
-survey_data <- left_join(survey_data, e_coli, by = "date")
+# Fix date issue with first respondent
 
+survey_data <- survey_data |> 
+  mutate(date = replace(date, as.Date(date) == "2023-06-15", as.Date("2023-06-16")))
+
+# Check for duplicate names 
+
+survey_data |> group_by(name1) |> filter(n()>1) 
+
+## Check for any follow-up participants that did not match to beach participants
+
+follow |> anti_join(beach, by = "name1")
+investigate <- follow |> anti_join(beach, by = "name1")
+
+## Merge E. coli data
+
+e_coli <- e_coli |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
+
+survey_data <- left_join(survey_data, e_coli, by = "date")
 
 ## Replace name column with unique/random ID - drop email, phone
 
