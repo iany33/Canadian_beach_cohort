@@ -60,9 +60,7 @@ data |> group_by(beach) |> select(beach, date, house_id) |>
 ```{r}
 #| echo: false
 data |> 
-  select(age1, gender, education2, residence, eth_arab, eth_black, 
-         eth_east_asian, eth_indigenous, eth_latin, eth_south_asian, 
-         eth_se_asian, eth_white, eth_other) |> 
+  select(age1, gender, education2, residence, ethnicity) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 ```
@@ -111,7 +109,7 @@ data |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, diarrhea3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
          misswork, med_antibiotics, med_otc, med_none, healthcare1, blood_stool1, 
          stool_test1, emergency, hospital) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
@@ -123,7 +121,7 @@ data_follow |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, diarrhea3, respiratory3, ear_infection3, eye_infection3, skin_infection3, 
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, 
          water_contact) |> 
   tbl_summary(by = water_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
@@ -132,25 +130,9 @@ data_follow |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, diarrhea3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
          sand_contact) |> 
   tbl_summary(by = sand_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
-  as_flex_table() 
-```
-
-## Compare Sociodemographics of those who Completed Follow-up Survey vs. Not
-
-```{r}
-#| echo: false
-data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=8) |> 
-  select(age1, gender, education, residence, eth_arab, eth_black, eth_east_asian,
-         eth_indigenous, eth_latin, eth_south_asian, eth_se_asian, eth_white, base_agi,
-         base_resp, base_ear, base_eye, base_skin, cond_GI, cond_resp, cond_skin,
-         cond_allergy, cond_immune, cond_none, prev_act1, water_contact, water_act_swim,
-         water_act_wade, water_exp_body, water_exp_head, water_exp_mouth, sand_contact,
-         sand_act_dig, sand_act_bury, sand_mouth1, follow)  |> 
-  tbl_summary(by = follow, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 ```
 
@@ -161,5 +143,19 @@ data |> mutate(follow_date = Sys.Date()-date) |>
 data |> distinct(house_id, preference) |>
   select(preference)  |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## Compare Sociodemographics of those who Completed Follow-up Survey vs. Not
+
+```{r}
+#| echo: false
+data |> mutate(follow_date = Sys.Date()-date) |> 
+  filter(follow_date >=8) |> 
+  select(age1, gender, education2, residence, ethnicity, base_agi,
+         base_resp, base_ear, base_eye, base_skin, water_contact, water_act_swim,
+         water_act_wade, water_exp_body, water_exp_head, water_exp_mouth, sand_contact,
+         sand_act_dig, sand_act_bury, sand_mouth1, follow)  |> 
+  tbl_summary(by = follow, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 ```
