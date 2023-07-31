@@ -109,14 +109,14 @@ data |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
-         misswork, med_antibiotics, med_otc, med_none, healthcare1, blood_stool1, 
-         stool_test1, emergency, hospital) |> 
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 ```
 
 ## Outcomes by Water and Sand Exposure Status - excluding those with same outcomes at baseline
+
+#### Any Water Contact
 
 ```{r}
 #| echo: false
@@ -127,6 +127,8 @@ data_follow |>
   as_flex_table() 
 ```
 
+#### Any Sand Contact
+
 ```{r}
 #| echo: false
 data_follow |> 
@@ -136,7 +138,7 @@ data_follow |>
   as_flex_table() 
 ```
 
-## Follow-up Contact Preference
+## Household Follow-up Contact Preference
 
 ```{r}
 #| echo: false
