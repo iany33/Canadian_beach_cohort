@@ -169,6 +169,14 @@ data <- data |>
     TRUE ~ "No")) |>
   mutate(diarrhea3 = as.factor(diarrhea3))
 
+# Create overall outcome variable
+
+data <- data |> 
+  mutate(illness_any = case_when(
+    (agi3 == "Yes" | respiratory3 == "Yes" | skin_infection3 == "Yes" | 
+       ear_infection3 == "Yes" | eye_infection3 == "Yes") ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(illness_any = as.factor(illness_any))
 
 # Convert various variables from text and NA to 1/0 entries
 
@@ -289,6 +297,11 @@ data <- data |> mutate(water_exp_mouth = case_when(water_exp_mouth == "mouth" ~ 
 data <- data |> mutate(water_exp_neither = case_when(water_exp_neither == "neither" ~ "Yes", TRUE ~ "No")) |>
   mutate(water_exp_neither = as.factor(water_exp_neither))
 
+data <- data |> mutate(water_exp_neither = case_when(water_exp_neither == "neither" ~ "Yes", TRUE ~ "No")) |>
+  mutate(water_exp_neither = as.factor(water_exp_neither))
+
+data <- data |> mutate(water_time = as.numeric(water_time))
+
 data <- data |> mutate(beach_exp_algae = case_when(beach_exp_algae == "algae" ~ "Yes", TRUE ~ "No")) |>
   mutate(beach_exp_algae = as.factor(beach_exp_algae))
 
@@ -392,7 +405,16 @@ data <- data |>
 
 data |> tabyl(ethnicity)  
     
-# Create water sports and other minimal contact variables
+# Create exposure variables
+
+data <- data |> 
+  mutate(water_contact2 = case_when(
+    water_contact == "No" ~ "No contact",
+    water_exp_mouth == "Yes" ~ "Swallowed water",
+    water_exp_body == "Yes" ~ "Body immersion",
+    TRUE ~ "Minimal contact")) |>
+  mutate(water_contact2 = as.factor(water_contact2)) |> 
+  mutate(water_contact2 = fct_relevel(water_contact2, "No contact", "Minimal contact")) 
 
 data <- data |> 
   mutate(water_sports = case_when(
@@ -408,7 +430,6 @@ data <- data |>
     TRUE ~ "No")) |>
   mutate(minimal_contact = as.factor(minimal_contact))
 
-
 # Define sand contact as only digging or burying - excluding others like tanning, laying in sand
 
 data <- data |> 
@@ -417,14 +438,63 @@ data <- data |>
     TRUE ~ "No")) |>
   mutate(sand_contact = as.factor(sand_contact))
 
+# Create weekend-holiday recruitment day variable
 
-# Create log E. coli variable
+data <- data |> 
+  mutate(weekend_holiday = case_when(
+    (dow == 1 | dow == 7) ~ "Yes",
+    date == "2023-07-03" ~ "Yes",
+    TRUE ~ "No")) 
+    
+# Create log E. coli variable and standardized version
 
 data <- data |> 
   mutate(log_ecoli = log(e_coli))
 
+data <- data |> 
+  mutate(e_coli_s = (e_coli - mean(e_coli)) / sd(e_coli))
 
+# Create E. coli threshold variables
 
+data <- data |> 
+  mutate(ecoli_100 = if_else(e_coli >=100, "Yes", "No"))
 
+data <- data |> 
+  mutate(ecoli_200 = if_else(e_coli >=200, "Yes", "No"))
+
+# Create standardized and binary MST variables
+
+data <- data |> 
+  mutate(mst_human_s = (mst_human - mean(mst_human, na.rm=TRUE)) / sd(mst_human, na.rm=TRUE))
+
+data <- data |> 
+  mutate(mst_gull_s = (mst_gull - mean(mst_gull, na.rm=TRUE)) / sd(mst_gull, na.rm=TRUE))
+
+data <- data |> 
+  mutate(mst_human2 = case_when(
+    mst_human > 0 ~ "Yes", TRUE ~ "No"))
+
+data <- data |> 
+  mutate(mst_gull2 = case_when(
+  mst_gull > 0 ~ "Yes", TRUE ~ "No"))
+
+# Create descriptive summaries
+
+# Descriptive Stats Summary
+
+num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
+num_participants <- data |> summarize(count = n())
+house_size <- round(num_participants/num_households, digits = 2)
+
+num_eligiblehouse_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
+  filter(follow_date >=8) |> select(house_id) |> n_distinct() |> as_tibble()
+num_eligible_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
+  filter(follow_date >=8) |> summarize(count = n())
+num_follow <- data |> filter(follow == "Yes") |> summarize(count = n())
+response_rate <- round(num_follow/num_eligible_follow*100, digits = 2)
+
+# Create dataset of those who completed follow-up survey
+
+data_follow <- data |> filter(follow == "Yes") 
 
 
