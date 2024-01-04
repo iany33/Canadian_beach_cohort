@@ -22,24 +22,6 @@ pacman::p_load(
 load("G:/My Drive/Research/Projects-TMU/Beach water illness/CIHR Bridge 2023-2024/Analysis_beach_cohort_study/.RData")
 ```
 
-# Descriptive Summary
-
-```{r}
-#| echo: false
-num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
-num_participants <- data |> summarize(count = n())
-house_size <- round(num_participants/num_households, digits = 2)
-
-num_eligiblehouse_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=8) |> select(house_id) |> n_distinct() |> as_tibble()
-num_eligible_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=8) |> summarize(count = n())
-num_follow <- data |> filter(follow == "Yes") |> summarize(count = n())
-response_rate <- round(num_follow/num_eligible_follow*100, digits = 2)
-
-data_follow <- data |> filter(follow == "Yes") 
-```
-
 As of `r Sys.Date()`, we have recruited `r num_participants` individual participants from `r num_households` households (mean household size = `r house_size`). A summary of their responses is highlighted below.
 
 Among `r num_eligiblehouse_follow` households and `r num_eligible_follow` individual participants that have completed the beach survey 7 or more days ago (and have had an opportunity to complete the follow-up), the **individual participant response rate** is `r response_rate`%.
@@ -53,6 +35,17 @@ data |> group_by(beach) |> select(beach, date, house_id) |>
              Num_participants = n(), 
              Num_days = n_distinct(date),
              Participants_per_day = round(Num_participants/Num_days, digits = 1))
+```
+
+## Recruitment Stats by Weekends/Holidays vs. Weekdays
+
+```{r}
+#| echo: false
+data |> group_by(weekend_holiday) |> select(date, weekend_holiday, house_id) |> 
+  summarize(Num_households = n_distinct(house_id),
+            Num_participants = n(), 
+            Num_days = n_distinct(date),
+            Participants_per_day = round(Num_participants/Num_days, digits = 1))
 ```
 
 ## Sociodemographics
@@ -109,7 +102,19 @@ data |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3) |> 
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, illness_any) |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+```
+
+## AGI Severity
+
+```{r}
+#| echo: false
+data_follow |>
+  filter(agi3 == "Yes") |> 
+  select(misswork, misswork_days, med_antibiotics, med_otc, med_none, healthcare1,
+         blood_stool1, stool_test1, emergency, hospital) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 ```
@@ -121,7 +126,7 @@ data_follow |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, 
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, illness_any,
          water_contact) |> 
   tbl_summary(by = water_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
@@ -132,7 +137,7 @@ data_follow |>
 ```{r}
 #| echo: false
 data_follow |> 
-  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3,
+  select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, illness_any,
          sand_contact) |> 
   tbl_summary(by = sand_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 

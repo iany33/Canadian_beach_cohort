@@ -8,14 +8,15 @@ pacman::p_load(
   lubridate,
   janitor,
   data.table,
-  uuid
+  uuid,
+  psych
 )
 
 beach <- import(here("Datasets", "2023-beach.xlsx"))
 follow <- import(here("Datasets", "2023-follow.xlsx"))
 
 e_coli <- import(here("Datasets", "2023_e_coli.xlsx"))
-
+mst <- import(here("Datasets", "2023_mst_data.xlsx"))
 
 # Clean variable names
 
@@ -24,78 +25,80 @@ follow <- follow |> clean_names()
 
 # Combine household member answers together then split into multiple rows per respondent
 
+beach <- beach |> mutate(others10 = NA)
+
 beach <- beach |> 
   unite(name, c("firstname", "lastname"), sep=" ") |> 
-  unite(name1, c("name", "name2", "name3", "name4", "name5", "name6"), sep=",") |> 
-  unite(age1, c("age", "age2", "age3", "age4", "age5", "age6"), sep=",") |> 
-  unite(sex1, c("sex", "sex2", "sex3", "sex4", "sex5", "sex6"), sep=",") |>
-  unite(sex_other, c("sex_other_sex", "sex2_other_sex", "sex3_other_sex", "sex4_other_sex", "sex5_other_sex", "sex6_other_sex"), sep=",")  |>   
-  unite(gender1, c("gender", "gender2", "gender3", "gender4", "gender5", "gender6"), sep=",") |>
-  unite(gender_other, c("gender_other_gender", "gender2_other_gender", "gender3_other_gender", "gender4_other_gender", "gender5_other_gender", "gender6_other_gender"), sep=",") |>  
-  unite(ethnicity_arab, c("ethnicity_arab", "ethnicity2_arab", "ethnicity3_arab", "ethnicity4_arab", "ethnicity5_arab", "ethnicity6_arab"), sep=",") |> 
-  unite(ethnicity_black, c("ethnicity_black", "ethnicity2_black", "ethnicity3_black", "ethnicity4_black", "ethnicity5_black", "ethnicity6_black"), sep=",") |> 
-  unite(ethnicity_east_asian, c("ethnicity_east_asian", "ethnicity2_east_asian", "ethnicity3_east_asian", "ethnicity4_east_asian", "ethnicity5_east_asian", "ethnicity6_east_asian"), sep=",") |> 
-  unite(ethnicity_indigenous, c("ethnicity_indigenous", "ethnicity2_indigenous", "ethnicity3_indigenous", "ethnicity4_indigenous", "ethnicity5_indigenous", "ethnicity6_indigenous"), sep=",") |> 
-  unite(ethnicity_latin, c("ethnicity_latin", "ethnicity2_latin", "ethnicity3_latin", "ethnicity4_latin", "ethnicity5_latin", "ethnicity6_latin"), sep=",") |> 
-  unite(ethnicity_south_asian, c("ethnicity_south_asian", "ethnicity2_south_asian", "ethnicity3_south_asian", "ethnicity4_south_asian", "ethnicity5_south_asian", "ethnicity6_south_asian"), sep=",") |> 
-  unite(ethnicity_se_asian, c("ethnicity_southeast_asian", "ethnicity2_southeast_asian", "ethnicity3_southeast_asian", "ethnicity4_southeast_asian", "ethnicity5_southeast_asian", "ethnicity6_southeast_asian"), sep=",") |> 
-  unite(ethnicity_white, c("ethnicity_white", "ethnicity2_white", "ethnicity3_white", "ethnicity4_white", "ethnicity5_white", "ethnicity6_white"), sep=",") |> 
-  unite(ethnicity_other, c("ethnicity_other_eth_35", "ethnicity2_other_eth_106", "ethnicity3_other_eth_177", "ethnicity4_other_eth_248", "ethnicity5_other_eth_319", "ethnicity6_other_eth_390"), sep=",") |> 
-  unite(ethnicity_other_s, c("ethnicity_other_eth_36", "ethnicity2_other_eth_107", "ethnicity3_other_eth_178", "ethnicity4_other_eth_249", "ethnicity5_other_eth_320", "ethnicity6_other_eth_391"), sep=",") |>
-  unite(ethnicity_na, c("ethnicity_na", "ethnicity2_na", "ethnicity3_na", "ethnicity4_na", "ethnicity5_na", "ethnicity6_na"), sep=",") |> 
-  unite(base_symp_diar, c("symptoms_diarrhea", "symptoms2_diarrhea", "symptoms3_diarrhea", "symptoms4_diarrhea", "symptoms5_diarrhea", "symptoms6_diarrhea"), sep=",") |> 
-  unite(base_symp_vomit, c("symptoms_vomiting", "symptoms2_vomiting", "symptoms3_vomiting", "symptoms4_vomiting", "symptoms5_vomiting", "symptoms6_vomiting"), sep=",") |> 
-  unite(base_symp_cramps, c("symptoms_cramps", "symptoms2_cramps", "symptoms3_cramps", "symptoms4_cramps", "symptoms5_cramps", "symptoms6_cramps"), sep=",") |> 
-  unite(base_symp_naus, c("symptoms_nausea", "symptoms2_nausea", "symptoms3_nausea", "symptoms4_nausea", "symptoms5_nausea", "symptoms6_nausea"), sep=",") |> 
-  unite(base_symp_fever, c("symptoms_fever", "symptoms2_fever", "symptoms3_fever", "symptoms4_fever", "symptoms5_fever", "symptoms6_fever"), sep=",") |> 
-  unite(base_symp_throat, c("symptoms_throat", "symptoms2_throat", "symptoms3_throat", "symptoms4_throat", "symptoms5_throat", "symptoms6_throat"), sep=",") |> 
-  unite(base_symp_nose, c("symptoms_nose", "symptoms2_nose", "symptoms3_nose", "symptoms4_nose", "symptoms5_nose", "symptoms6_nose"), sep=",") |> 
-  unite(base_symp_cough, c("symptoms_cough", "symptoms2_cough", "symptoms3_cough", "symptoms4_cough",  "symptoms5_cough", "symptoms6_cough"), sep=",") |> 
-  unite(base_symp_ear, c("symptoms_ear", "symptoms2_ear", "symptoms3_ear", "symptoms4_ear", "symptoms5_ear", "symptoms6_ear"), sep=",") |> 
-  unite(base_symp_eye, c("symptoms_eye", "symptoms2_eye", "symptoms3_eye", "symptoms4_eye", "symptoms5_eye", "symptoms6_eye"), sep=",") |> 
-  unite(base_symp_rash, c("symptoms_rash", "symptoms2_rash", "symptoms3_rash", "symptoms4_rash", "symptoms5_rash", "symptoms6_rash"), sep=",") |> 
-  unite(base_symp_none, c("symptoms_none", "symptoms2_none", "symptoms3_none", "symptoms4_none", "symptoms5_none", "symptoms6_none"), sep=",") |> 
-  unite(cond_GI, c("conditions_gi", "conditions2_gi", "conditions3_gi", "conditions4_gi", "conditions5_gi", "conditions6_gi"), sep=",") |> 
-  unite(cond_resp, c("conditions_respiratory", "conditions2_respiratory", "conditions3_respiratory", "conditions4_respiratory", "conditions5_respiratory", "conditions6_respiratory"), sep=",") |> 
-  unite(cond_skin, c("conditions_skin", "conditions2_skin", "conditions3_skin", "conditions4_skin", "conditions5_skin", "conditions6_skin"), sep=",") |> 
-  unite(cond_allergy, c("conditions_allergies", "conditions2_allergies", "conditions3_allergies", "conditions4_allergies", "conditions5_allergies", "conditions6_allergies"), sep=",")  |> 
-  unite(cond_immune, c("conditions_immune", "conditions2_immune", "conditions3_immune", "conditions4_immune", "conditions5_immune", "conditions6_immune"), sep=",")  |>
-  unite(cond_none, c("conditions_none", "conditions2_none", "conditions3_none", "conditions4_none", "conditions5_none", "conditions6_none"), sep=",")  |>
-  unite(prev_act1, c("prev_act", "prev_act2", "prev_act3", "prev_act4", "prev_act5", "prev_act6"), sep=",") |>
-  unite(water_contact, c("swam", "swam2", "swam3", "swam4", "swam5", "swam6"), sep=",") |> 
-  unite(water_act_swim, c("water_act_swim", "water_act2_swim", "water_act3_swim", "water_act4_swim", "water_act5_swim", "water_act6_swim"), sep=",") |> 
-  unite(water_act_surf, c("water_act_surf", "water_act2_surf", "water_act3_surf", "water_act4_surf", "water_act5_surf", "water_act6_surf"), sep=",") |> 
-  unite(water_act_kite, c("water_act_kite", "water_act2_kite", "water_act3_kite", "water_act4_kite", "water_act5_kite", "water_act6_kite"), sep=",") |> 
-  unite(water_act_wind, c("water_act_wind", "water_act2_wind", "water_act3_wind", "water_act4_wind", "water_act5_wind", "water_act6_wind"), sep=",") |> 
-  unite(water_act_wake, c("water_act_wake", "water_act2_wake", "water_act3_wake", "water_act4_wake", "water_act5_wake", "water_act6_wake"), sep=",") |> 
-  unite(water_act_ski, c("water_act_ski", "water_act2_ski", "water_act3_ski", "water_act4_ski", "water_act5_ski", "water_act6_ski"), sep=",") |> 
-  unite(water_act_paddle, c("water_act_paddle", "water_act2_paddle", "water_act3_paddle", "water_act4_paddle", "water_act5_paddle", "water_act6_paddle"), sep=",") |> 
-  unite(water_act_snorkel, c("water_act_snorkel", "water_act2_snorkel", "water_act3_snorkel", "water_act4_snorkel", "water_act5_snorkel", "water_act6_snorkel"), sep=",") |> 
-  unite(water_act_dive, c("water_act_dive", "water_act2_dive", "water_act3_dive", "water_act4_dive", "water_act5_dive", "water_act6_dive"), sep=",") |> 
-  unite(water_act_wade, c("water_act_wade", "water_act2_wade", "water_act3_wade", "water_act4_wade", "water_act5_wade", "water_act6_wade"), sep=",") |> 
-  unite(water_act_sail, c("water_act_sail", "water_act2_sail", "water_act3_sail", "water_act4_sail", "water_act5_sail", "water_act6_sail"), sep=",") |> 
-  unite(water_act_boat, c("water_act_boat", "water_act2_boat", "water_act3_boat", "water_act4_boat", "water_act5_boat", "water_act6_boat"), sep=",") |> 
-  unite(water_act_fish, c("water_act_fish", "water_act2_fish", "water_act3_fish", "water_act4_fish", "water_act5_fish", "water_act6_fish"), sep=",") |> 
-  unite(water_act_canoe, c("water_act_canoe", "water_act2_canoe", "water_act3_canoe", "water_act4_canoe", "water_act5_canoe", "water_act6_canoe"), sep=",") |> 
-  unite(water_act_kayak, c("water_act_kayak", "water_act2_kayak", "water_act3_kayak", "water_act4_kayak", "water_act5_kayak", "water_act6_kayak"), sep=",") |> 
-  unite(water_act_other, c("water_act_other_74", "water_act2_other_145", "water_act3_other_216", "water_act4_other_287", "water_act5_other_358", "water_act6_other_429"), sep=",") |>   
-  unite(water_act_other_s, c("water_act_other_75", "water_act2_other_146", "water_act3_other_217", "water_act4_other_288", "water_act5_other_359", "water_act6_other_430"), sep=",") |>  
-  unite(water_exp_body, c("water_exp_face", "water_exp2_face", "water_exp3_face", "water_exp4_face", "water_exp5_face", "water_exp6_face"), sep=",") |> 
-  unite(water_exp_head, c("water_exp_head", "water_exp2_head", "water_exp3_head", "water_exp4_head", "water_exp5_head", "water_exp6_head"), sep=",") |> 
-  unite(water_exp_mouth, c("water_exp_mouth", "water_exp2_mouth", "water_exp3_mouth", "water_exp4_mouth", "water_exp5_mouth", "water_exp6_mouth"), sep=",") |> 
-  unite(water_exp_neither, c("water_exp_neither", "water_exp2_neither", "water_exp3_neither", "water_exp4_neither", "water_exp5_neither", "water_exp6_neither"), sep=",") |> 
-  unite(water_time, c("water_time", "water_time2", "water_time3", "water_time4", "water_time5", "water_time6"), sep=",") |> 
-  unite(beach_exp_algae, c("beach_exp_algae", "beach_exp2_algae", "beach_exp3_algae", "beach_exp4_algae", "beach_exp5_algae", "beach_exp6_algae"), sep=",") |> 
-  unite(beach_exp_sun, c("beach_exp_sun", "beach_exp2_sun", "beach_exp3_sun", "beach_exp4_sun", "beach_exp5_sun", "beach_exp6_sun"), sep=",") |> 
-  unite(beach_exp_rep, c("beach_exp_repellent", "beach_exp2_repellent", "beach_exp3_repellent", "beach_exp4_repellent", "beach_exp5_repellent", "beach_exp6_repellent"), sep=",") |> 
-  unite(beach_exp_food, c("beach_exp_food", "beach_exp2_food", "beach_exp3_food", "beach_exp4_food", "beach_exp5_food", "beach_exp6_food"), sep=",") |> 
-  unite(sand1, c("sand", "sand2", "sand3", "sand4", "sand5", "sand6"), sep=",") |> 
-  unite(sand_act_dig, c("sand_act_dig", "sand_act2_dig", "sand_act3_dig", "sand_act4_dig", "sand_act5_dig", "sand_act6_dig"), sep=",") |> 
-  unite(sand_act_bury, c("sand_act_bury", "sand_act2_bury", "sand_act3_bury", "sand_act4_bury", "sand_act5_bury", "sand_act6_bury"), sep=",") |> 
-  unite(sand_act_other, c("sand_act_other_89", "sand_act2_other_160", "sand_act3_other_231", "sand_act4_other_302", "sand_act5_other_373", "sand_act6_other_444"), sep=",") |>   
-  unite(sand_act_other_s, c("sand_act_other_90", "sand_act2_other_161", "sand_act3_other_232", "sand_act4_other_303", "sand_act5_other_374", "sand_act6_other_445"), sep=",") |> 
-  unite(sand_mouth1, c("sand_mouth", "sand_mouth2", "sand_mouth3", "sand_mouth4", "sand_mouth5", "sand_mouth6"), sep=",")  |> 
-  unite(others, c("others", "others2", "others3", "others4", "others5", "others6"), sep=",")
+  unite(name1, starts_with("name"), sep=",") |> 
+  unite(age1, starts_with("age"), sep=",") |> 
+  unite(sex1, c("sex", num_range("sex", 2:10)), sep=",") |>
+  unite(sex_other, ends_with("other_sex"), sep=",")  |>   
+  unite(gender1, c("gender", num_range("gender", 2:10)), sep=",") |>
+  unite(gender_other, ends_with("other_gender"), sep=",") |>  
+  unite(ethnicity_arab, ends_with("arab"), sep=",") |> 
+  unite(ethnicity_black, ends_with("black"), sep=",") |> 
+  unite(ethnicity_se_asian, ends_with("southeast_asian"), sep=",") |> 
+  unite(ethnicity_east_asian, ends_with("east_asian"), sep=",") |> 
+  unite(ethnicity_indigenous, ends_with("indigenous"), sep=",") |> 
+  unite(ethnicity_latin, ends_with("latin"), sep=",") |> 
+  unite(ethnicity_south_asian, ends_with("south_asian"), sep=",") |> 
+  unite(ethnicity_white, ends_with("white"), sep=",") |> 
+  unite(ethnicity_other, c("ethnicity_other_eth_35", "ethnicity2_other_eth_106", "ethnicity3_other_eth_177", "ethnicity4_other_eth_248", "ethnicity5_other_eth_319", "ethnicity6_other_eth_390", "ethnicity7_other_eth_461", "ethnicity8_other_eth_532", "ethnicity9_other_eth_603", "ethnicity10_other_eth_674"), sep=",") |> 
+  unite(ethnicity_other_s, c("ethnicity_other_eth_36", "ethnicity2_other_eth_107", "ethnicity3_other_eth_178", "ethnicity4_other_eth_249", "ethnicity5_other_eth_320", "ethnicity6_other_eth_391","ethnicity7_other_eth_462", "ethnicity8_other_eth_533", "ethnicity9_other_eth_604", "ethnicity10_other_eth_675"), sep=",") |>
+  unite(ethnicity_na, matches("^ethnicity.*na$"), sep=",") |> 
+  unite(base_symp_diar, ends_with("diarrhea"), sep=",") |> 
+  unite(base_symp_vomit, ends_with("vomiting"), sep=",") |> 
+  unite(base_symp_cramps, ends_with("cramps"), sep=",") |> 
+  unite(base_symp_naus, ends_with("nausea"), sep=",") |> 
+  unite(base_symp_fever, ends_with("fever"), sep=",") |> 
+  unite(base_symp_throat, ends_with("throat"), sep=",") |> 
+  unite(base_symp_nose, ends_with("nose"), sep=",") |> 
+  unite(base_symp_cough, ends_with("cough"), sep=",") |> 
+  unite(base_symp_ear, ends_with("ear"), sep=",") |> 
+  unite(base_symp_eye, ends_with("eye"), sep=",") |> 
+  unite(base_symp_rash, ends_with("rash"), sep=",") |> 
+  unite(base_symp_none, matches("^symptoms.*none$"), sep=",") |> 
+  unite(cond_GI, ends_with("gi"), sep=",") |> 
+  unite(cond_resp, ends_with("respiratory"), sep=",") |> 
+  unite(cond_skin, ends_with("skin"), sep=",") |> 
+  unite(cond_allergy, ends_with("allergies"), sep=",")  |> 
+  unite(cond_immune, ends_with("immune"), sep=",")  |>
+  unite(cond_none, matches("^conditions.*none$"), sep=",")  |>
+  unite(prev_act1, starts_with("prev_act"), sep=",") |>
+  unite(water_contact, starts_with("swam"), sep=",") |> 
+  unite(water_act_swim, ends_with("swim"), sep=",") |> 
+  unite(water_act_surf, ends_with("surf"), sep=",") |> 
+  unite(water_act_kite, ends_with("kite"), sep=",") |> 
+  unite(water_act_wind, ends_with("wind"), sep=",") |> 
+  unite(water_act_wake, ends_with("wake"), sep=",") |> 
+  unite(water_act_ski, ends_with("ski"), sep=",") |> 
+  unite(water_act_paddle, ends_with("paddle"), sep=",") |> 
+  unite(water_act_snorkel, ends_with("snorkel"), sep=",") |> 
+  unite(water_act_dive, ends_with("dive"), sep=",") |> 
+  unite(water_act_wade, ends_with("wade"), sep=",") |> 
+  unite(water_act_sail, ends_with("sail"), sep=",") |> 
+  unite(water_act_boat, ends_with("boat"), sep=",") |> 
+  unite(water_act_fish, ends_with("fish"), sep=",") |> 
+  unite(water_act_canoe, ends_with("canoe"), sep=",") |> 
+  unite(water_act_kayak, ends_with("kayak"), sep=",") |> 
+  unite(water_act_other, c("water_act_other_74", "water_act2_other_145", "water_act3_other_216", "water_act4_other_287", "water_act5_other_358", "water_act6_other_429", "water_act7_other_500", "water_act8_other_571", "water_act9_other_642", "water_act10_other_713"), sep=",") |>   
+  unite(water_act_other_s, c("water_act_other_75", "water_act2_other_146", "water_act3_other_217", "water_act4_other_288", "water_act5_other_359", "water_act6_other_430", "water_act7_other_501", "water_act8_other_572", "water_act9_other_643", "water_act10_other_714"), sep=",") |>  
+  unite(water_exp_body, ends_with("face"), sep=",") |> 
+  unite(water_exp_head, ends_with("head"), sep=",") |> 
+  unite(water_exp_mouth, matches("^water_exp.*mouth$"), sep=",") |> 
+  unite(water_exp_neither, ends_with("neither"), sep=",") |> 
+  unite(water_time, starts_with("water_time"), sep=",") |> 
+  unite(beach_exp_algae, ends_with("algae"), sep=",") |> 
+  unite(beach_exp_sun, ends_with("sun"), sep=",") |> 
+  unite(beach_exp_rep, ends_with("repellent"), sep=",") |> 
+  unite(beach_exp_food, ends_with("food"), sep=",") |> 
+  unite(sand1, c("sand", num_range("sand", 2:10)), sep=",") |> 
+  unite(sand_act_dig, ends_with("dig"), sep=",") |> 
+  unite(sand_act_bury, ends_with("bury"), sep=",") |> 
+  unite(sand_act_other, c("sand_act_other_89", "sand_act2_other_160", "sand_act3_other_231", "sand_act4_other_302", "sand_act5_other_373", "sand_act6_other_444", "sand_act7_other_515", "sand_act8_other_586", "sand_act9_other_657", "sand_act10_other_728"), sep=",") |>   
+  unite(sand_act_other_s, c("sand_act_other_90", "sand_act2_other_161", "sand_act3_other_232", "sand_act4_other_303", "sand_act5_other_374", "sand_act6_other_445", "sand_act7_other_516", "sand_act8_other_587", "sand_act9_other_658", "sand_act10_other_729"), sep=",") |> 
+  unite(sand_mouth1, starts_with("sand_mouth"), sep=",")  |> 
+  unite(others, starts_with("others"), sep=",")
 
 beach <- beach |> 
   separate_rows(name1, age1, sex1, sex_other, gender1, gender_other, ethnicity_arab, ethnicity_black, 
@@ -110,41 +113,41 @@ beach <- beach |>
                 water_act_fish, water_act_canoe, water_act_kayak, water_act_other, water_act_other_s, 
                 water_time, water_exp_body, water_exp_head, water_exp_mouth, water_exp_neither, 
                 beach_exp_algae, beach_exp_sun, beach_exp_rep, beach_exp_food, sand1, sand_act_dig, 
-                sand_act_bury, sand_act_other, sand_act_other_s, sand_mouth1,
-                others, sep=",") 
+                sand_act_bury, sand_act_other, sand_act_other_s, sand_mouth1, others, sep=",") 
 
 beach <- beach[!(beach$name1=="NA"),]
-beach <- select(beach, -name7:-sand_mouth10)
+
+follow <- follow |> mutate(others10 = NA)
 
 follow <- follow |> 
   unite(household_name, c("first_name", "last_name"), sep=" ") |> 
   unite(name, c("fname", "lname"), sep=" ") |> 
-  unite(name1, c("name", "name2", "name3", "name4", "name5", "name6"), sep=",") |> 
-  unite(rec_act1, c("rec_act", "rec_act2", "rec_act3", "rec_act4", "rec_act5", "rec_act6"), sep=",") |> 
-  unite(symptoms_diar, c("symptomsdiarrhea", "symptoms2diarrhea", "symptoms3diarrhea", "symptoms4diarrhea", "symptoms5diarrhea", "symptoms6diarrhea"), sep=",") |> 
-  unite(symptoms_vomit, c("symptomsvomiting", "symptoms2vomiting", "symptoms3vomiting", "symptoms4vomiting", "symptoms5vomiting", "symptoms6vomiting"), sep=",") |> 
-  unite(symptoms_cramps, c("symptomscramps", "symptoms2cramps", "symptoms3cramps", "symptoms4cramps", "symptoms5cramps", "symptoms6cramps"), sep=",") |> 
-  unite(symptoms_naus, c("symptomsnausea", "symptoms2nausea", "symptoms3nausea", "symptoms4nausea", "symptoms5nausea", "symptoms6nausea"), sep=",") |> 
-  unite(symptoms_fever, c("symptomsfever", "symptoms2fever", "symptoms3fever", "symptoms4fever", "symptoms5fever", "symptoms6fever"), sep=",") |> 
-  unite(symptoms_throat, c("symptomsthroat", "symptoms2throat", "symptoms3throat", "symptoms4throat", "symptoms5throat", "symptoms6throat"), sep=",") |> 
-  unite(symptoms_nose, c("symptomsnose", "symptoms2nose", "symptoms3nose", "symptoms4nose", "symptoms5nose", "symptoms6nose"), sep=",") |> 
-  unite(symptoms_cough, c("symptomscough", "symptoms2cough", "symptoms3cough", "symptoms4cough", "symptoms5cough","symptoms6cough"), sep=",") |> 
-  unite(symptoms_ear, c("symptomsear", "symptoms2ear", "symptoms3ear", "symptoms4ear", "symptoms5ear", "symptoms6ear"), sep=",") |> 
-  unite(symptoms_eye, c("symptomseye", "symptoms2eye", "symptoms3eye", "symptoms4eye", "symptoms5eye", "symptoms6eye"), sep=",") |> 
-  unite(symptoms_rash, c("symptomsrash", "symptoms2rash", "symptoms3rash", "symptoms4rash", "symptoms5rash", "symptoms6rash"), sep=",") |> 
-  unite(symptoms_none, c("symptomsnone", "symptoms2none", "symptoms3none", "symptoms4none", "symptoms5none", "symptoms6none"), sep=",") |> 
-  unite(symp_date, c("symp_start", "symp_start2", "symp_start3", "symp_start4", "symp_start5","symp_start6"), sep=",") |> 
-  unite(misswork, c("misswork", "misswork2", "misswork3", "misswork4", "misswork5", "misswork6"), sep=",") |> 
-  unite(misswork_days, c("misswork1", "misswork21", "misswork31", "misswork41", "misswork51", "misswork61"), sep=",") |> 
-  unite(med_antibiotics, c("medicationantibiotics", "medication2antibiotics", "medication3antibiotics", "medication4antibiotics", "medications5antibiotics", "medication6antibiotics"), sep=",") |> 
-  unite(med_otc, c("medicationotc_drugs", "medication2otc_drugs", "medication3otc_drugs", "medication4otc_drugs", "medications5otc_drugs", "medication6otc_drugs"), sep=",") |> 
-  unite(med_none, c("medicationnone", "medication2none", "medication3none", "medication4none", "medications5none", "medication6none"), sep=",")  |> 
-  unite(healthcare1, c("healthcare", "healthcare2", "healthcare3", "healthcare4", "healthcare5", "healthcare6"), sep=",")  |>
-  unite(blood_stool1, c("blood_stool", "blood_stool2", "blood_stool3", "blood_stool4", "blood_stool5", "blood_stool6"), sep=",")  |>
-  unite(stool_test1, c("stool_test", "stool_test2", "stool_test3", "stool_test4", "stool_test5", "stool_test6"), sep=",")  |>
-  unite(emergency, c("ed_visit", "ed_visit2", "ed_visit3", "ed_visit4", "ed_visit5", "ed_visit6"), sep=",")  |>
-  unite(hospital, c("hospitalized", "hospitalized2", "hospitalized3", "hospitalized4", "hospitalized5", "hospitalized6"), sep=",") |>
-  unite(others_follow, c("others", "others2", "others3", "others4", "others5", "others6"), sep=",")
+  unite(name1, starts_with("name"), sep=",") |> 
+  unite(rec_act1, starts_with("rec_act"), sep=",") |> 
+  unite(symptoms_diar, ends_with("diarrhea"), sep=",") |>  
+  unite(symptoms_vomit, c("symptoms_vomiting",), sep=",") |>  
+  unite(symptoms_cramps, c("symptoms_cramps"), sep=",") |> 
+  unite(symptoms_naus, c("symptoms_nausea"), sep=",") |>  
+  unite(symptoms_fever, c("symptoms_fever"), sep=",") |> 
+  unite(symptoms_throat, c("symptoms_throat"), sep=",") |> 
+  unite(symptoms_nose, c("symptoms_nose"), sep=",") |> 
+  unite(symptoms_cough, c("symptoms_cough"), sep=",") |> 
+  unite(symptoms_ear, c("symptoms_ear"), sep=",") |> 
+  unite(symptoms_eye, c("symptoms_eye"), sep=",") |>  
+  unite(symptoms_rash, c("symptoms_rash"), sep=",") |> 
+  unite(symptoms_none, c("symptoms_none"), sep=",") |>  
+  unite(symp_date, c("symp_start"), sep=",") |> 
+  unite(misswork, c("misswork", num_range("misswork", 2:10)), sep=",") |> 
+  unite(misswork_days, matches("^misswork.*1$"), sep=",") |> 
+  unite(med_antibiotics, ends_with("antibiotics"), sep=",") |> 
+  unite(med_otc, ends_with("drugs"), sep=",") |> 
+  unite(med_none, matches("^medication.*none$"), sep=",")  |> 
+  unite(healthcare1, starts_with("healthcare"), sep=",")  |>
+  unite(blood_stool1, starts_with("blood_stool"), sep=",")  |>
+  unite(stool_test1, starts_with("stool_test"), sep=",")  |>
+  unite(emergency, starts_with("ed_visit"), sep=",")  |>
+  unite(hospital, starts_with("hospitalized"), sep=",") |>
+  unite(others_follow, starts_with("others"), sep=",")
 
 follow <- follow |> 
   separate_rows(name1, rec_act1, symptoms_diar, symptoms_vomit, symptoms_cramps, 
@@ -155,7 +158,6 @@ follow <- follow |>
                 emergency, hospital, others_follow, sep=",") 
 
 follow <- follow[!(follow$name1=="NA"),]
-follow <- select(follow, -name7:-hospitalized10)
 
 # Merge survey datasets
 
@@ -185,12 +187,66 @@ survey_data |> group_by(name1) |> filter(n()>1)
 follow |> anti_join(beach, by = "name1")
 investigate <- follow |> anti_join(beach, by = "name1")
 
-## Merge E. coli data
+## Load, Format and Merge E. coli data
 
 e_coli <- e_coli |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
+MC_data <- import(here("Datasets", "2023-MC.xlsx"))
+SS_data <- import(here("Datasets", "2023-SS.xlsx"))
+
+MC_data <- MC_data |> 
+  group_by(date) |> 
+  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
+  distinct(date, e_coli) |> 
+  ungroup()
+
+MC_data <- MC_data |> 
+  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
+  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
+
+SS_data <- SS_data |> 
+  group_by(date) |> 
+  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
+  distinct(date, e_coli) |> 
+  ungroup()
+
+SS_data <- SS_data |> 
+  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
+  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
+
+e_coli1 <- e_coli |> filter(beach == "Marie Curtis") |> 
+  left_join(MC_data, by = "date")
+
+e_coli2 <- e_coli |> filter(beach == "Sunnyside") |> 
+  left_join(SS_data, by = "date") 
+
+e_coli <- rbind(e_coli1, e_coli2)
+
+e_coli <- e_coli |> arrange(date)
+
+remove(MC_data, SS_data, e_coli1, e_coli2)
+
 survey_data <- left_join(survey_data, e_coli, by = "date")
+
+# Format MST data
+
+mst <- mst |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) |> 
+  mutate_all(function(x) gsub("BD", 0, x)) |> 
+  mutate(HF183_human = as.numeric(HF183_human)) |> 
+  mutate(Gull4_marker = as.numeric(Gull4_marker)) 
+    
+mst <- mst |> 
+  group_by(date) |> 
+  summarize(mst_human = mean(HF183_human),
+            mst_gull = mean(Gull4_marker)) |> 
+  ungroup()
+
+mst <- mst |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
+
+survey_data <- left_join(survey_data, mst, by = "date")
 
 ## Replace name column with unique/random ID - drop email, phone
 
@@ -202,7 +258,7 @@ survey_data <- survey_data |>
     id = uuid::UUIDgenerate(use.time = FALSE)
   ) |> 
   ungroup() |> 
-  select(-name1, participant_id = id) |> 
+  select(-name1, -household_name, participant_id = id) |> 
   relocate(participant_id)
 
 survey_data <- survey_data |> 
@@ -211,6 +267,6 @@ survey_data <- survey_data |>
 
 data <- subset(survey_data, select = -c(email.x, email.y, phone))
 
-remove(beach, beach_surveys, follow, investigate, survey_data)
+remove(beach, follow, investigate, survey_data)
 
 
