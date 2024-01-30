@@ -22,7 +22,7 @@ pacman::p_load(
 load("G:/My Drive/Research/Projects-TMU/Beach water illness/CIHR Bridge 2023-2024/Analysis_beach_cohort_study/.RData")
 ```
 
-As of `r Sys.Date()`, we have recruited `r num_participants` individual participants from `r num_households` households (mean household size = `r house_size`). A summary of their responses is highlighted below.
+As of `r Sys.Date()`, we have recruited `r num_participants` individual participants from `r num_households` households (mean household size = `r house_size`). Of these participants, `r num_participants-num_unique_participants` participated in the study more than once. A summary of participant responses is highlighted below.
 
 Among `r num_eligiblehouse_follow` households and `r num_eligible_follow` individual participants that have completed the beach survey 7 or more days ago (and have had an opportunity to complete the follow-up), the **individual participant response rate** is `r response_rate`%.
 

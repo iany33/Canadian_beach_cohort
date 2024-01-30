@@ -125,18 +125,18 @@ follow <- follow |>
   unite(name1, starts_with("name"), sep=",") |> 
   unite(rec_act1, starts_with("rec_act"), sep=",") |> 
   unite(symptoms_diar, ends_with("diarrhea"), sep=",") |>  
-  unite(symptoms_vomit, c("symptoms_vomiting",), sep=",") |>  
-  unite(symptoms_cramps, c("symptoms_cramps"), sep=",") |> 
-  unite(symptoms_naus, c("symptoms_nausea"), sep=",") |>  
-  unite(symptoms_fever, c("symptoms_fever"), sep=",") |> 
-  unite(symptoms_throat, c("symptoms_throat"), sep=",") |> 
-  unite(symptoms_nose, c("symptoms_nose"), sep=",") |> 
-  unite(symptoms_cough, c("symptoms_cough"), sep=",") |> 
-  unite(symptoms_ear, c("symptoms_ear"), sep=",") |> 
-  unite(symptoms_eye, c("symptoms_eye"), sep=",") |>  
-  unite(symptoms_rash, c("symptoms_rash"), sep=",") |> 
-  unite(symptoms_none, c("symptoms_none"), sep=",") |>  
-  unite(symp_date, c("symp_start"), sep=",") |> 
+  unite(symptoms_vomit, ends_with("vomiting"), sep=",") |>  
+  unite(symptoms_cramps, ends_with("cramps"), sep=",") |> 
+  unite(symptoms_naus, ends_with("nausea"), sep=",") |>  
+  unite(symptoms_fever, ends_with("fever"), sep=",") |> 
+  unite(symptoms_throat, ends_with("throat"), sep=",") |> 
+  unite(symptoms_nose, ends_with("nose"), sep=",") |> 
+  unite(symptoms_cough, ends_with("cough"), sep=",") |> 
+  unite(symptoms_ear, ends_with("ear"), sep=",") |> 
+  unite(symptoms_eye, ends_with("eye"), sep=",") |>  
+  unite(symptoms_rash, ends_with("rash"), sep=",") |> 
+  unite(symptoms_none, matches("^symptoms.*none$"), sep=",") |>  
+  unite(symp_date, starts_with("symp_start"), sep=",") |> 
   unite(misswork, c("misswork", num_range("misswork", 2:10)), sep=",") |> 
   unite(misswork_days, matches("^misswork.*1$"), sep=",") |> 
   unite(med_antibiotics, ends_with("antibiotics"), sep=",") |> 
@@ -248,21 +248,30 @@ mst <- mst |>
 
 survey_data <- left_join(survey_data, mst, by = "date")
 
+## Reformat participants in survey that participated more than once 
+
+survey_data <- survey_data |> 
+  mutate(name1 = str_remove_all(survey_data$name1, "[0-9]$"))
+
+survey_data <- survey_data |> 
+  group_by(name1) |> 
+  mutate(house_id = first(house_id)) |> 
+  ungroup() 
+
 ## Replace name column with unique/random ID - drop email, phone
 
 survey_data$row_id <- 1:nrow(survey_data)
 
 survey_data <- survey_data |> 
   group_by(name1) |> 
-  mutate(
-    id = uuid::UUIDgenerate(use.time = FALSE)
-  ) |> 
+  mutate(participant_id = cur_group_id()) |> 
   ungroup() |> 
-  select(-name1, -household_name, participant_id = id) |> 
-  relocate(participant_id)
+  select(-name1, participant_id) |> 
+  relocate(participant_id, .after = house_id)
+
+survey_data$participant_id <- paste("TO_2023", survey_data$participant_id, sep = "_")
 
 survey_data <- survey_data |> 
-  relocate(participant_id, .after = house_id)  |> 
   relocate(row_id, .after = participant_id)
 
 data <- subset(survey_data, select = -c(email.x, email.y, phone))

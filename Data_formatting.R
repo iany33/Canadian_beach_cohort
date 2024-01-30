@@ -484,6 +484,7 @@ data <- data |>
 
 num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
 num_participants <- data |> summarize(count = n())
+num_unique_participants <- data |> distinct(participant_id) |> summarize(count = n())
 house_size <- round(num_participants/num_households, digits = 2)
 
 num_eligiblehouse_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
