@@ -12,6 +12,9 @@ pacman::p_load(
   forcats       # factors
 )
 
+# Combine data from across sites/regions
+
+data <- data_TO
 
 # Create variable to determine if follow-up was complete or not
 
@@ -20,7 +23,6 @@ data  <- data  |>
     (rec_act1 == 1 | rec_act1 == 0) ~ "Yes", 
     TRUE ~ "No")) |> 
   mutate(follow = as.factor(follow)) 
-
 
 # Format symptom start date variable
 
@@ -323,15 +325,77 @@ data <- data |> mutate(sand_act_bury = case_when(sand_act_bury == "bury" ~ "Yes"
 data <- data |> mutate(sand_act_other = case_when(sand_act_other == "other" ~ "Yes", TRUE ~ "No")) |>
   mutate(sand_act_other = as.factor(sand_act_other))
 
-data <- data |> mutate(med_antibiotics = case_when(med_antibiotics == "antibiotics" ~ "Yes", TRUE ~ "No")) |>
+# Recode illness severity outcomes only for those with AGI symptoms
+
+data <- data |> 
+  mutate(misswork = case_when(
+    (agi3 == "Yes" & misswork == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
+  mutate(misswork = as.factor(misswork))
+
+data <- data |> 
+  mutate(misswork_days = case_when(
+    agi3 == "No" ~ NA,
+    misswork_days == "NA" ~ NA,
+    TRUE ~ misswork_days)) |>
+  mutate(misswork_days = as.numeric(misswork_days))
+
+data <- data |> 
+  mutate(med_antibiotics = case_when(
+    (agi3 == "Yes" & med_antibiotics == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
   mutate(med_antibiotics = as.factor(med_antibiotics))
 
-data <- data |> mutate(med_otc = case_when(med_otc == "otc_drugs" ~ "Yes", TRUE ~ "No")) |>
+data <- data |> 
+  mutate(med_otc = case_when(
+    (agi3 == "Yes" & med_otc == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
   mutate(med_otc = as.factor(med_otc))
 
-data <- data |> mutate(med_none = case_when(med_none == "none" ~ "Yes", TRUE ~ "No")) |>
+data <- data |> 
+  mutate(med_none = case_when(
+    (agi3 == "Yes" & med_none == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
   mutate(med_none = as.factor(med_none))
 
+data <- data |> 
+  mutate(healthcare1 = case_when(
+    (agi3 == "Yes" & healthcare1 == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
+  mutate(healthcare1 = as.factor(healthcare1))
+
+data <- data |> 
+  mutate(blood_stool1 = case_when(
+    (agi3 == "Yes" & blood_stool1 == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
+  mutate(blood_stool1 = as.factor(blood_stool1))
+
+data <- data |> 
+  mutate(stool_test1 = case_when(
+    (agi3 == "Yes" & stool_test1 == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
+  mutate(stool_test1 = as.factor(stool_test1))
+
+data <- data |> 
+  mutate(emergency = case_when(
+    (agi3 == "Yes" & emergency == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
+  mutate(emergency = as.factor(emergency))
+
+data <- data |> 
+  mutate(hospital = case_when(
+    (agi3 == "Yes" & hospital == 1) ~ "Yes",
+    agi3 == "No" ~ NA,
+    TRUE ~ "No")) |>
+  mutate(hospital = as.factor(hospital))
 
 # Recode some socio-demographic variables
 
@@ -478,8 +542,6 @@ data <- data |>
   mutate(mst_gull2 = case_when(
   mst_gull > 0 ~ "Yes", TRUE ~ "No"))
 
-# Create descriptive summaries
-
 # Descriptive Stats Summary
 
 num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
@@ -498,4 +560,6 @@ response_rate <- round(num_follow/num_eligible_follow*100, digits = 2)
 
 data_follow <- data |> filter(follow == "Yes") 
 
+# Export dataset
 
+export(data, "data_TO_23.xlsx")
