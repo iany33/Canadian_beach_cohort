@@ -12,16 +12,41 @@ pacman::p_load(
   psych
 )
 
-beach <- import(here("Datasets", "2023-beach.xlsx"))
-follow <- import(here("Datasets", "2023-follow.xlsx"))
+beach <- import(here("Datasets", "Manitoba", "2024-beach-Manitoba.xlsx"))
+follow <- import(here("Datasets", "Manitoba", "2024-follow-Manitoba.xlsx"))
 
-e_coli <- import(here("Datasets", "2023_e_coli.xlsx"))
-mst <- import(here("Datasets", "2023_mst_data.xlsx"))
+e_coli <- import(here("Datasets", "Manitoba", "2024_e_coli_Manitoba.xlsx"))
+
+mst <- import(here("Datasets", "Manitoba", "2024_molecular_Manitoba.xlsx"))
 
 # Clean variable names
 
 beach <- beach  |> clean_names()
 follow <- follow |> clean_names()
+
+# Remove dog and algal bloom survey symptoms
+
+beach <- beach |> 
+  select(-pets, -pets1, -dog_name:-dog_sand5) |> 
+  select(-matches("^symptoms.*breathing$")) |> 
+  select(-matches("^symptoms.*fatigue$")) |> 
+  select(-matches("^symptoms.*dizzy$")) |> 
+  select(-matches("^symptoms.*appetite$")) |> 
+  select(-matches("^symptoms.*chills$")) |> 
+  select(-matches("^symptoms.*muscles$")) |> 
+  select(-matches("^symptoms.*pain$")) |> 
+  select(-matches("^symptoms.*head$"))
+
+follow <- follow |> 
+  select(-pet_participation, -dog_name:-dog_hospital5) |> 
+  select(-matches("^symptoms.*breathing$")) |> 
+  select(-matches("^symptoms.*fatigue$")) |> 
+  select(-matches("^symptoms.*dizzy$")) |> 
+  select(-matches("^symptoms.*appetite$")) |> 
+  select(-matches("^symptoms.*chills$")) |> 
+  select(-matches("^symptoms.*muscles$")) |> 
+  select(-matches("^symptoms.*pain$")) |> 
+  select(-matches("^symptoms.*head$"))
 
 # Combine household member answers together then split into multiple rows per respondent
 
@@ -39,12 +64,12 @@ beach <- beach |>
   unite(ethnicity_black, ends_with("black"), sep=",") |> 
   unite(ethnicity_se_asian, ends_with("southeast_asian"), sep=",") |> 
   unite(ethnicity_east_asian, ends_with("east_asian"), sep=",") |> 
-  unite(ethnicity_indigenous, ends_with("indigenous"), sep=",") |> 
+  unite(ethnicity_indigenous, starts_with("indigenous"), sep=",") |> 
   unite(ethnicity_latin, ends_with("latin"), sep=",") |> 
   unite(ethnicity_south_asian, ends_with("south_asian"), sep=",") |> 
   unite(ethnicity_white, ends_with("white"), sep=",") |> 
-  unite(ethnicity_other, c("ethnicity_other_eth_35", "ethnicity2_other_eth_106", "ethnicity3_other_eth_177", "ethnicity4_other_eth_248", "ethnicity5_other_eth_319", "ethnicity6_other_eth_390", "ethnicity7_other_eth_461", "ethnicity8_other_eth_532", "ethnicity9_other_eth_603", "ethnicity10_other_eth_674"), sep=",") |> 
-  unite(ethnicity_other_s, c("ethnicity_other_eth_36", "ethnicity2_other_eth_107", "ethnicity3_other_eth_178", "ethnicity4_other_eth_249", "ethnicity5_other_eth_320", "ethnicity6_other_eth_391","ethnicity7_other_eth_462", "ethnicity8_other_eth_533", "ethnicity9_other_eth_604", "ethnicity10_other_eth_675"), sep=",") |>
+  unite(ethnicity_other, c("ethnicityother_eth_37", "ethnicity2other_eth_116", "ethnicity3other_eth_195", "ethnicity4other_eth_274", "ethnicity5other_eth_353", "ethnicity6other_eth_432", "ethnicity7other_eth_511", "ethnicity8other_eth_590", "ethnicity9other_eth_669", "ethnicity10other_eth_748"), sep=",") |> 
+  unite(ethnicity_other_s, c("ethnicityother_eth_38", "ethnicity2other_eth_117", "ethnicity3other_eth_196", "ethnicity4other_eth_275", "ethnicity5other_eth_354", "ethnicity6other_eth_433","ethnicity7other_eth_512", "ethnicity8other_eth_591", "ethnicity9other_eth_670", "ethnicity10other_eth_749"), sep=",") |>
   unite(ethnicity_na, matches("^ethnicity.*na$"), sep=",") |> 
   unite(base_symp_diar, ends_with("diarrhea"), sep=",") |> 
   unite(base_symp_vomit, ends_with("vomiting"), sep=",") |> 
@@ -64,6 +89,7 @@ beach <- beach |>
   unite(cond_allergy, ends_with("allergies"), sep=",")  |> 
   unite(cond_immune, ends_with("immune"), sep=",")  |>
   unite(cond_none, matches("^conditions.*none$"), sep=",")  |>
+  unite(cond_na, matches("^conditions.*na$"), sep=",")  |>
   unite(prev_act1, starts_with("prev_act"), sep=",") |>
   unite(water_contact, starts_with("swam"), sep=",") |> 
   unite(water_act_swim, ends_with("swim"), sep=",") |> 
@@ -81,8 +107,8 @@ beach <- beach |>
   unite(water_act_fish, ends_with("fish"), sep=",") |> 
   unite(water_act_canoe, ends_with("canoe"), sep=",") |> 
   unite(water_act_kayak, ends_with("kayak"), sep=",") |> 
-  unite(water_act_other, c("water_act_other_74", "water_act2_other_145", "water_act3_other_216", "water_act4_other_287", "water_act5_other_358", "water_act6_other_429", "water_act7_other_500", "water_act8_other_571", "water_act9_other_642", "water_act10_other_713"), sep=",") |>   
-  unite(water_act_other_s, c("water_act_other_75", "water_act2_other_146", "water_act3_other_217", "water_act4_other_288", "water_act5_other_359", "water_act6_other_430", "water_act7_other_501", "water_act8_other_572", "water_act9_other_643", "water_act10_other_714"), sep=",") |>  
+  unite(water_act_other, c("water_actother_84", "water_act2other_163", "water_act3other_242", "water_act4other_321", "water_act5other_400", "water_act6other_479", "water_act7other_558", "water_act8other_637", "water_act9other_716", "water_act10other_795"), sep=",") |>   
+  unite(water_act_other_s, c("water_actother_85", "water_act2other_164", "water_act3other_243", "water_act4other_322", "water_act5other_401", "water_act6other_480", "water_act7other_559", "water_act8other_638", "water_act9other_717", "water_act10other_796"), sep=",") |>  
   unite(water_exp_body, ends_with("face"), sep=",") |> 
   unite(water_exp_head, ends_with("head"), sep=",") |> 
   unite(water_exp_mouth, matches("^water_exp.*mouth$"), sep=",") |> 
@@ -95,8 +121,8 @@ beach <- beach |>
   unite(sand1, c("sand", num_range("sand", 2:10)), sep=",") |> 
   unite(sand_act_dig, ends_with("dig"), sep=",") |> 
   unite(sand_act_bury, ends_with("bury"), sep=",") |> 
-  unite(sand_act_other, c("sand_act_other_89", "sand_act2_other_160", "sand_act3_other_231", "sand_act4_other_302", "sand_act5_other_373", "sand_act6_other_444", "sand_act7_other_515", "sand_act8_other_586", "sand_act9_other_657", "sand_act10_other_728"), sep=",") |>   
-  unite(sand_act_other_s, c("sand_act_other_90", "sand_act2_other_161", "sand_act3_other_232", "sand_act4_other_303", "sand_act5_other_374", "sand_act6_other_445", "sand_act7_other_516", "sand_act8_other_587", "sand_act9_other_658", "sand_act10_other_729"), sep=",") |> 
+  unite(sand_act_other, c("sand_actother_99", "sand_act2other_178", "sand_act3other_257", "sand_act4other_336", "sand_act5other_415", "sand_act6other_494", "sand_act7other_573", "sand_act8other_652", "sand_act9other_731", "sand_act10other_810"), sep=",") |>   
+  unite(sand_act_other_s, c("sand_actother_100", "sand_act2other_179", "sand_act3other_258", "sand_act4other_337", "sand_act5other_416", "sand_act6other_495", "sand_act7other_574", "sand_act8other_653", "sand_act9other_732", "sand_act10other_811"), sep=",") |> 
   unite(sand_mouth1, starts_with("sand_mouth"), sep=",")  |> 
   unite(others, starts_with("others"), sep=",")
 
@@ -107,7 +133,7 @@ beach <- beach |>
                 base_symp_diar, base_symp_vomit, base_symp_cramps, base_symp_naus, base_symp_fever, 
                 base_symp_throat, base_symp_nose, base_symp_cough, base_symp_ear, base_symp_eye, 
                 base_symp_rash, base_symp_none, cond_GI, cond_resp, cond_skin, cond_allergy, 
-                cond_immune, cond_none, prev_act1, water_contact, water_act_swim, water_act_surf, 
+                cond_immune, cond_none, cond_na, prev_act1, water_contact, water_act_swim, water_act_surf, 
                 water_act_kite, water_act_wind, water_act_wake, water_act_ski, water_act_paddle, 
                 water_act_snorkel, water_act_dive, water_act_wade, water_act_sail, water_act_boat, 
                 water_act_fish, water_act_canoe, water_act_kayak, water_act_other, water_act_other_s, 
@@ -171,12 +197,6 @@ survey_data <- survey_data |>
   mutate(date = as.Date(date))  |> 
   mutate(month = as.factor(month(date))) |> 
   mutate(dow = as.factor(wday(date))) # Sunday is 1, Sat. is 7
-
-# Fix access/completion date issue with some respondents
-
-survey_data <- survey_data |> 
-  mutate(date = replace(date, as.Date(date) == "2023-06-15", as.Date("2023-06-16"))) |> 
-  mutate(date = replace(date, as.Date(date) == "2023-07-04", as.Date("2023-07-05"))) 
 
 # Check for duplicate names 
 
@@ -253,9 +273,14 @@ survey_data <- left_join(survey_data, mst, by = "date")
 survey_data <- survey_data |> 
   mutate(name1 = str_remove_all(survey_data$name1, "[0-9]$"))
 
-survey_data <- survey_data |> 
-  group_by(name1) |> 
-  mutate(house_id = first(house_id)) |> 
+investigate <- survey_data |> 
+  add_count(name1) |> 
+  filter(n!=1) |> 
+  select (-n)
+
+survey_data <- survey_data |>
+  group_by(name1) |>
+  mutate(house_id = first(house_id)) |>
   ungroup() 
 
 ## Replace name column with unique/random ID - drop email, phone
@@ -266,15 +291,15 @@ survey_data <- survey_data |>
   group_by(name1) |> 
   mutate(participant_id = cur_group_id()) |> 
   ungroup() |> 
-  select(-name1, participant_id) |> 
+  select(-name1, -household_name, participant_id) |> 
   relocate(participant_id, .after = house_id)
 
-survey_data$participant_id <- paste("TO_2023", survey_data$participant_id, sep = "_")
+survey_data$participant_id <- paste("MB_2024", survey_data$participant_id, sep = "_")
 
 survey_data <- survey_data |> 
   relocate(row_id, .after = participant_id)
 
-data <- subset(survey_data, select = -c(email.x, email.y, phone))
+data_TO <- subset(survey_data, select = -c(email.x, email.y, phone))
 
 remove(beach, follow, investigate, survey_data)
 
