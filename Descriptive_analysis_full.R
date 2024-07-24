@@ -9,6 +9,15 @@ pacman::p_load(
   flextable
 )
 
+# Examine E. coli results
+
+data |>
+  ggplot(aes(x = date, y = e_coli)) +
+  geom_point(colour = "black") + 
+  geom_line(colour = "steelblue") + 
+  theme_minimal() +
+  labs(y = "E. coli (CFU / 100 mL)", x = "Recruitment date")
+
 # Examine MST results
 
 data |> 

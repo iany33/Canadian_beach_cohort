@@ -1,5 +1,7 @@
 
 pacman::p_load(
+  rio, 
+  here,
   skimr,        # get overview of data
   Matrix,
   tidyverse,    # data management + ggplot2 graphics, 
@@ -14,7 +16,12 @@ pacman::p_load(
 
 # Combine data from across sites/regions
 
-data <- data_TO
+data_VAN <- import(here("Datasets", "Vancouver", "data_VAN.csv"))
+data_MB <- import(here("Datasets", "Manitoba", "data_MB.csv"))
+
+data_MB <- data_MB |> mutate(ethnicity_indigenous = as.factor(ethnicity_indigenous))
+
+data <- full_join(data_MB, data_VAN)
 
 # Create variable to determine if follow-up was complete or not
 
@@ -209,7 +216,9 @@ data <- data |> mutate(eth_black = case_when(ethnicity_black == "black" ~ "Yes",
 data <- data |> mutate(eth_east_asian = case_when(ethnicity_east_asian == "east_asian" ~ "Yes", TRUE ~ "No")) |>
   mutate(eth_east_asian = as.factor(eth_east_asian))
 
-data <- data |> mutate(eth_indigenous = case_when(ethnicity_indigenous == "indigenous" ~ "Yes", TRUE ~ "No")) |>
+data <- data |> mutate(eth_indigenous = case_when(
+  (ethnicity_indigenous == "indigenous" | ethnicity_indigenous == 1) ~ "Yes", 
+  TRUE ~ "No")) |>
   mutate(eth_indigenous = as.factor(eth_indigenous))
 
 data <- data |> mutate(eth_latin = case_when(ethnicity_latin == "latin" ~ "Yes", TRUE ~ "No")) |>
@@ -230,7 +239,9 @@ data <- data |> mutate(eth_other = case_when(ethnicity_other == "other_eth" ~ "Y
 data <- data |> mutate(prev_act1 = case_when(prev_act1 == 1 ~ "Yes", prev_act1 == "NA" ~ NA_character_, TRUE ~ "No")) |>
   mutate(prev_act1 = as.factor(prev_act1))
 
-data <- data |> mutate(water_contact = case_when(water_contact == 1 ~ "Yes", water_contact == "NA" ~ NA_character_, TRUE ~ "No")) |>
+data <- data |> mutate(water_contact = case_when(water_contact == 1 ~ "Yes", 
+                                                 water_contact == "NA" ~ NA_character_, 
+                                                 TRUE ~ "No")) |>
   mutate(water_contact = as.factor(water_contact))
 
 data <- data |> mutate(sand1 = case_when(sand1 == 1 ~ "Yes", sand1 == "NA" ~ NA_character_, TRUE ~ "No")) |>
@@ -295,9 +306,6 @@ data <- data |> mutate(water_exp_head = case_when(water_exp_head == "head" ~ "Ye
 
 data <- data |> mutate(water_exp_mouth = case_when(water_exp_mouth == "mouth" ~ "Yes", TRUE ~ "No")) |>
   mutate(water_exp_mouth = as.factor(water_exp_mouth))
-
-data <- data |> mutate(water_exp_neither = case_when(water_exp_neither == "neither" ~ "Yes", TRUE ~ "No")) |>
-  mutate(water_exp_neither = as.factor(water_exp_neither))
 
 data <- data |> mutate(water_exp_neither = case_when(water_exp_neither == "neither" ~ "Yes", TRUE ~ "No")) |>
   mutate(water_exp_neither = as.factor(water_exp_neither))
@@ -401,7 +409,7 @@ data <- data |>
 
 data <- data |> 
   mutate(age1 = fct_relevel(age1, "5-9", after = 1)) |> 
-  mutate(education = fct_relevel(education, "none", "secondary", "apprenticeship", "college", "bachleors", "graduate"))
+  mutate(education = fct_relevel(education, "none", "secondary", "apprenticeship", "college", "bachelors", "graduate"))
 
 levels(data$age1)
 levels(data$education)
@@ -410,7 +418,7 @@ data <- data |>
   mutate(education2 = case_when(
     (education == "none" | education == "secondary") ~ "high school or less",
     (education == "apprenticeship" | education == "college") ~ "college/trades",
-    (education == "bachleors" | education == "bachelors") ~ "bachelors",
+    (education == "bachelors" | education == "bachelors") ~ "bachelors",
     education == "graduate" ~ "post-graduate",
         TRUE ~ NA_character_))  |>
   mutate(education2 = fct_relevel(education2, "high school or less", "college/trades", "bachelors", "post-graduate"))
@@ -516,7 +524,7 @@ data <- data |>
   mutate(log_ecoli = log(e_coli))
 
 data <- data |> 
-  mutate(e_coli_s = (e_coli - mean(e_coli)) / sd(e_coli))
+  mutate(e_coli_s = (e_coli - mean(e_coli, na.rm = TRUE)) / sd(e_coli, na.rm = TRUE))
 
 # Create E. coli threshold variables
 
@@ -542,24 +550,10 @@ data <- data |>
   mutate(mst_gull2 = case_when(
   mst_gull > 0 ~ "Yes", TRUE ~ "No"))
 
-# Descriptive Stats Summary
-
-num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
-num_participants <- data |> summarize(count = n())
-num_unique_participants <- data |> distinct(participant_id) |> summarize(count = n())
-house_size <- round(num_participants/num_households, digits = 2)
-
-num_eligiblehouse_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=8) |> select(house_id) |> n_distinct() |> as_tibble()
-num_eligible_follow <- data |> mutate(follow_date = Sys.Date()-date) |> 
-  filter(follow_date >=8) |> summarize(count = n())
-num_follow <- data |> filter(follow == "Yes") |> summarize(count = n())
-response_rate <- round(num_follow/num_eligible_follow*100, digits = 2)
-
 # Create dataset of those who completed follow-up survey
 
 data_follow <- data |> filter(follow == "Yes") 
 
 # Export dataset
 
-export(data, "data_TO_23.xlsx")
+export(data, "data_2024.xlsx")

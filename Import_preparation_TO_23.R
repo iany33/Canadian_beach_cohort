@@ -12,11 +12,11 @@ pacman::p_load(
   psych
 )
 
-beach <- import(here("Datasets", "2023-beach.xlsx"))
-follow <- import(here("Datasets", "2023-follow.xlsx"))
+beach <- import(here("Datasets", "Toronto", "2023-beach.xlsx"))
+follow <- import(here("Datasets", "Toronto", "2023-follow.xlsx"))
 
-e_coli <- import(here("Datasets", "2023_e_coli.xlsx"))
-mst <- import(here("Datasets", "2023_mst_data.xlsx"))
+e_coli <- import(here("Datasets", "Toronto", "2023_e_coli.xlsx"))
+mst <- import(here("Datasets", "Toronto", "2023_mst_data.xlsx"))
 
 # Clean variable names
 
@@ -64,6 +64,7 @@ beach <- beach |>
   unite(cond_allergy, ends_with("allergies"), sep=",")  |> 
   unite(cond_immune, ends_with("immune"), sep=",")  |>
   unite(cond_none, matches("^conditions.*none$"), sep=",")  |>
+  unite(cond_na, matches("^conditions.*na$"), sep=",")  |>
   unite(prev_act1, starts_with("prev_act"), sep=",") |>
   unite(water_contact, starts_with("swam"), sep=",") |> 
   unite(water_act_swim, ends_with("swim"), sep=",") |> 
@@ -107,7 +108,7 @@ beach <- beach |>
                 base_symp_diar, base_symp_vomit, base_symp_cramps, base_symp_naus, base_symp_fever, 
                 base_symp_throat, base_symp_nose, base_symp_cough, base_symp_ear, base_symp_eye, 
                 base_symp_rash, base_symp_none, cond_GI, cond_resp, cond_skin, cond_allergy, 
-                cond_immune, cond_none, prev_act1, water_contact, water_act_swim, water_act_surf, 
+                cond_immune, cond_none, cond_na, prev_act1, water_contact, water_act_swim, water_act_surf, 
                 water_act_kite, water_act_wind, water_act_wake, water_act_ski, water_act_paddle, 
                 water_act_snorkel, water_act_dive, water_act_wade, water_act_sail, water_act_boat, 
                 water_act_fish, water_act_canoe, water_act_kayak, water_act_other, water_act_other_s, 
@@ -192,8 +193,8 @@ investigate <- follow |> anti_join(beach, by = "name1")
 e_coli <- e_coli |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
-MC_data <- import(here("Datasets", "2023-MC.xlsx"))
-SS_data <- import(here("Datasets", "2023-SS.xlsx"))
+MC_data <- import(here("Datasets", "Toronto", "2023-MC.xlsx"))
+SS_data <- import(here("Datasets", "Toronto", "2023-SS.xlsx"))
 
 MC_data <- MC_data |> 
   group_by(date) |> 
@@ -283,4 +284,5 @@ data_TO <- subset(survey_data, select = -c(email.x, email.y, phone))
 
 remove(beach, follow, investigate, survey_data)
 
+export(data_TO)
 

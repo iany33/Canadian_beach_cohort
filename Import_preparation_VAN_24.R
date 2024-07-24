@@ -12,12 +12,10 @@ pacman::p_load(
   psych
 )
 
-beach <- import(here("Datasets", "2024-beach-Vancouver.xlsx"))
-follow <- import(here("Datasets", "2024-follow-Vancouver.xlsx"))
+beach <- import(here("Datasets", "Vancouver", "2024-beach-Vancouver.xlsx"))
+follow <- import(here("Datasets", "Vancouver", "2024-follow-Vancouver.xlsx"))
 
-e_coli <- import(here("Datasets", "2024_e_coli_Vancouver.xlsx"))
-
-mst <- import(here("Datasets", "2024_molecular_Vancouver.xlsx"))
+e_coli <- import(here("Datasets", "Vancouver", "2024-e_coli_Vancouver.xlsx"))
 
 # Clean variable names
 
@@ -33,7 +31,7 @@ beach <- beach |>
   unite(name1, starts_with("name"), sep=",") |> 
   unite(age1, starts_with("age"), sep=",") |> 
   unite(sex1, c("sex", num_range("sex", 2:10)), sep=",") |>
-  unite(sex_other, ends_with("other_sex"), sep=",")  |>   
+  unite(sexother, ends_with("other_sex"), sep=",")  |>   
   unite(gender1, c("gender", num_range("gender", 2:10)), sep=",") |>
   unite(gender_other, ends_with("other_gender"), sep=",") |>  
   unite(ethnicity_arab, ends_with("arab"), sep=",") |> 
@@ -103,7 +101,7 @@ beach <- beach |>
   unite(others, starts_with("others"), sep=",")
 
 beach <- beach |> 
-  separate_rows(name1, age1, sex1, sex_other, gender1, gender_other, ethnicity_arab, ethnicity_black, 
+  separate_rows(name1, age1, sex1, sexother, gender1, gender_other, ethnicity_arab, ethnicity_black, 
                 ethnicity_east_asian, ethnicity_indigenous, ethnicity_latin, ethnicity_south_asian, 
                 ethnicity_se_asian, ethnicity_white, ethnicity_other, ethnicity_other_s, ethnicity_na, 
                 base_symp_diar, base_symp_vomit, base_symp_cramps, base_symp_naus, base_symp_fever, 
@@ -174,75 +172,32 @@ survey_data <- survey_data |>
   mutate(month = as.factor(month(date))) |> 
   mutate(dow = as.factor(wday(date))) # Sunday is 1, Sat. is 7
 
+# Fix access/completion date issue with some respondents
+
+survey_data <- survey_data |> 
+  mutate(date = replace(date, as.Date(date) == "2024-06-12", as.Date("2024-06-13")))
+
 # Check for duplicate names 
 
-survey_data |> group_by(name1) |> filter(n()>1) 
+survey_data |> group_by(name1) |> filter(n()>1) |> select(house_id, date, name1, household_name)
 
 ## Check for any follow-up participants that did not match to beach participants
 
-follow |> anti_join(beach, by = "name1")
+follow |> anti_join(beach, by = "name1") |> select(household_name, submitted_date, name1)
 investigate <- follow |> anti_join(beach, by = "name1")
 
-## Load, Format and Merge E. coli data
+## Load, Format and Merge Lab Results
 
 e_coli <- e_coli |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
-MC_data <- import(here("Datasets", "2023-MC.xlsx"))
-SS_data <- import(here("Datasets", "2023-SS.xlsx"))
+e_coli <- e_coli |> rowwise() |>
+  mutate(e_coli = mean(c(e_coli1, e_coli2)))
 
-MC_data <- MC_data |> 
-  group_by(date) |> 
-  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
-  distinct(date, e_coli) |> 
-  ungroup()
-
-MC_data <- MC_data |> 
-  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
-
-SS_data <- SS_data |> 
-  group_by(date) |> 
-  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
-  distinct(date, e_coli) |> 
-  ungroup()
-
-SS_data <- SS_data |> 
-  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
-
-e_coli1 <- e_coli |> filter(beach == "Marie Curtis") |> 
-  left_join(MC_data, by = "date")
-
-e_coli2 <- e_coli |> filter(beach == "Sunnyside") |> 
-  left_join(SS_data, by = "date") 
-
-e_coli <- rbind(e_coli1, e_coli2)
-
-e_coli <- e_coli |> arrange(date)
-
-remove(MC_data, SS_data, e_coli1, e_coli2)
+e_coli <- e_coli |> rowwise() |>
+  mutate(e_coli_max = max(c(e_coli1, e_coli2)))
 
 survey_data <- left_join(survey_data, e_coli, by = "date")
-
-# Format MST data
-
-mst <- mst |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) |> 
-  mutate_all(function(x) gsub("BD", 0, x)) |> 
-  mutate(HF183_human = as.numeric(HF183_human)) |> 
-  mutate(Gull4_marker = as.numeric(Gull4_marker)) 
-    
-mst <- mst |> 
-  group_by(date) |> 
-  summarize(mst_human = mean(HF183_human),
-            mst_gull = mean(Gull4_marker)) |> 
-  ungroup()
-
-mst <- mst |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
-
-survey_data <- left_join(survey_data, mst, by = "date")
 
 ## Reformat participants in survey that participated more than once 
 
@@ -275,8 +230,11 @@ survey_data$participant_id <- paste("VAN_2024", survey_data$participant_id, sep 
 survey_data <- survey_data |> 
   relocate(row_id, .after = participant_id)
 
-data_TO <- subset(survey_data, select = -c(email.x, email.y, phone))
+data_VAN <- subset(survey_data, select = -c(email.x, email.y, phone))
 
 remove(beach, follow, investigate, survey_data)
+
+data_VAN |> export(here("Datasets", "Vancouver", "data_VAN.csv"))
+
 
 

@@ -15,9 +15,7 @@ pacman::p_load(
 beach <- import(here("Datasets", "Manitoba", "2024-beach-Manitoba.xlsx"))
 follow <- import(here("Datasets", "Manitoba", "2024-follow-Manitoba.xlsx"))
 
-e_coli <- import(here("Datasets", "Manitoba", "2024_e_coli_Manitoba.xlsx"))
-
-mst <- import(here("Datasets", "Manitoba", "2024_molecular_Manitoba.xlsx"))
+e_coli <- import(here("Datasets", "Manitoba", "2024-e_coli_Manitoba.xlsx"))
 
 # Clean variable names
 
@@ -27,7 +25,7 @@ follow <- follow |> clean_names()
 # Remove dog and algal bloom survey symptoms
 
 beach <- beach |> 
-  select(-pets, -pets1, -dog_name:-dog_sand5) |> 
+  select(-pets, -pets_1, -dog_name:-dog_sand5) |> 
   select(-matches("^symptoms.*breathing$")) |> 
   select(-matches("^symptoms.*fatigue$")) |> 
   select(-matches("^symptoms.*dizzy$")) |> 
@@ -68,8 +66,8 @@ beach <- beach |>
   unite(ethnicity_latin, ends_with("latin"), sep=",") |> 
   unite(ethnicity_south_asian, ends_with("south_asian"), sep=",") |> 
   unite(ethnicity_white, ends_with("white"), sep=",") |> 
-  unite(ethnicity_other, c("ethnicityother_eth_37", "ethnicity2other_eth_116", "ethnicity3other_eth_195", "ethnicity4other_eth_274", "ethnicity5other_eth_353", "ethnicity6other_eth_432", "ethnicity7other_eth_511", "ethnicity8other_eth_590", "ethnicity9other_eth_669", "ethnicity10other_eth_748"), sep=",") |> 
-  unite(ethnicity_other_s, c("ethnicityother_eth_38", "ethnicity2other_eth_117", "ethnicity3other_eth_196", "ethnicity4other_eth_275", "ethnicity5other_eth_354", "ethnicity6other_eth_433","ethnicity7other_eth_512", "ethnicity8other_eth_591", "ethnicity9other_eth_670", "ethnicity10other_eth_749"), sep=",") |>
+  unite(ethnicity_other, c("ethnicity_other_eth_37", "ethnicity2_other_eth_116", "ethnicity3_other_eth_195", "ethnicity4_other_eth_274", "ethnicity5_other_eth_353", "ethnicity6_other_eth_432", "ethnicity7_other_eth_511", "ethnicity8_other_eth_590", "ethnicity9_other_eth_669", "ethnicity10_other_eth_748"), sep=",") |> 
+  unite(ethnicity_other_s, c("ethnicity_other_eth_38", "ethnicity2_other_eth_117", "ethnicity3_other_eth_196", "ethnicity4_other_eth_275", "ethnicity5_other_eth_354", "ethnicity6_other_eth_433","ethnicity7_other_eth_512", "ethnicity8_other_eth_591", "ethnicity9_other_eth_670", "ethnicity10_other_eth_749"), sep=",") |>
   unite(ethnicity_na, matches("^ethnicity.*na$"), sep=",") |> 
   unite(base_symp_diar, ends_with("diarrhea"), sep=",") |> 
   unite(base_symp_vomit, ends_with("vomiting"), sep=",") |> 
@@ -107,8 +105,8 @@ beach <- beach |>
   unite(water_act_fish, ends_with("fish"), sep=",") |> 
   unite(water_act_canoe, ends_with("canoe"), sep=",") |> 
   unite(water_act_kayak, ends_with("kayak"), sep=",") |> 
-  unite(water_act_other, c("water_actother_84", "water_act2other_163", "water_act3other_242", "water_act4other_321", "water_act5other_400", "water_act6other_479", "water_act7other_558", "water_act8other_637", "water_act9other_716", "water_act10other_795"), sep=",") |>   
-  unite(water_act_other_s, c("water_actother_85", "water_act2other_164", "water_act3other_243", "water_act4other_322", "water_act5other_401", "water_act6other_480", "water_act7other_559", "water_act8other_638", "water_act9other_717", "water_act10other_796"), sep=",") |>  
+  unite(water_act_other, c("water_act_other_84", "water_act2_other_163", "water_act3_other_242", "water_act4_other_321", "water_act5_other_400", "water_act6_other_479", "water_act7_other_558", "water_act8_other_637", "water_act9_other_716", "water_act10_other_795"), sep=",") |>   
+  unite(water_act_other_s, c("water_act_other_85", "water_act2_other_164", "water_act3_other_243", "water_act4_other_322", "water_act5_other_401", "water_act6_other_480", "water_act7_other_559", "water_act8_other_638", "water_act9_other_717", "water_act10_other_796"), sep=",") |>  
   unite(water_exp_body, ends_with("face"), sep=",") |> 
   unite(water_exp_head, ends_with("head"), sep=",") |> 
   unite(water_exp_mouth, matches("^water_exp.*mouth$"), sep=",") |> 
@@ -121,8 +119,8 @@ beach <- beach |>
   unite(sand1, c("sand", num_range("sand", 2:10)), sep=",") |> 
   unite(sand_act_dig, ends_with("dig"), sep=",") |> 
   unite(sand_act_bury, ends_with("bury"), sep=",") |> 
-  unite(sand_act_other, c("sand_actother_99", "sand_act2other_178", "sand_act3other_257", "sand_act4other_336", "sand_act5other_415", "sand_act6other_494", "sand_act7other_573", "sand_act8other_652", "sand_act9other_731", "sand_act10other_810"), sep=",") |>   
-  unite(sand_act_other_s, c("sand_actother_100", "sand_act2other_179", "sand_act3other_258", "sand_act4other_337", "sand_act5other_416", "sand_act6other_495", "sand_act7other_574", "sand_act8other_653", "sand_act9other_732", "sand_act10other_811"), sep=",") |> 
+  unite(sand_act_other, c("sand_act_other_99", "sand_act2_other_178", "sand_act3_other_257", "sand_act4_other_336", "sand_act5_other_415", "sand_act6_other_494", "sand_act7_other_573", "sand_act8_other_652", "sand_act9_other_731", "sand_act10_other_810"), sep=",") |>   
+  unite(sand_act_other_s, c("sand_act_other_100", "sand_act2_other_179", "sand_act3_other_258", "sand_act4_other_337", "sand_act5_other_416", "sand_act6_other_495", "sand_act7_other_574", "sand_act8_other_653", "sand_act9_other_732", "sand_act10_other_811"), sep=",") |> 
   unite(sand_mouth1, starts_with("sand_mouth"), sep=",")  |> 
   unite(others, starts_with("others"), sep=",")
 
@@ -200,73 +198,30 @@ survey_data <- survey_data |>
 
 # Check for duplicate names 
 
-survey_data |> group_by(name1) |> filter(n()>1) 
+survey_data |> group_by(name1) |> filter(n()>1) |> select(house_id, date, name1)
 
 ## Check for any follow-up participants that did not match to beach participants
 
-follow |> anti_join(beach, by = "name1")
+follow |> anti_join(beach, by = "name1") |> select(household_name, submitted_date, name1)
 investigate <- follow |> anti_join(beach, by = "name1")
 
-## Load, Format and Merge E. coli data
+## Load, Format and Merge Lab Results
+# For now, reformat <10 E. coli to 0 counts to allow averaging and merging with other sites
 
 e_coli <- e_coli |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
-MC_data <- import(here("Datasets", "2023-MC.xlsx"))
-SS_data <- import(here("Datasets", "2023-SS.xlsx"))
+e_coli <- e_coli |> 
+  mutate(e_coli1 = ifelse(e_coli1 == "<10", 0, as.numeric(e_coli1)),
+         e_coli2 = ifelse(e_coli2 == "<10", 0, as.numeric(e_coli2)))
 
-MC_data <- MC_data |> 
-  group_by(date) |> 
-  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
-  distinct(date, e_coli) |> 
-  ungroup()
+e_coli <- e_coli |> rowwise() |>
+  mutate(e_coli = mean(c(e_coli1, e_coli2)))
 
-MC_data <- MC_data |> 
-  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
-
-SS_data <- SS_data |> 
-  group_by(date) |> 
-  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
-  distinct(date, e_coli) |> 
-  ungroup()
-
-SS_data <- SS_data |> 
-  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
-
-e_coli1 <- e_coli |> filter(beach == "Marie Curtis") |> 
-  left_join(MC_data, by = "date")
-
-e_coli2 <- e_coli |> filter(beach == "Sunnyside") |> 
-  left_join(SS_data, by = "date") 
-
-e_coli <- rbind(e_coli1, e_coli2)
-
-e_coli <- e_coli |> arrange(date)
-
-remove(MC_data, SS_data, e_coli1, e_coli2)
+e_coli <- e_coli |> rowwise() |>
+  mutate(e_coli_max = max(c(e_coli1, e_coli2)))
 
 survey_data <- left_join(survey_data, e_coli, by = "date")
-
-# Format MST data
-
-mst <- mst |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) |> 
-  mutate_all(function(x) gsub("BD", 0, x)) |> 
-  mutate(HF183_human = as.numeric(HF183_human)) |> 
-  mutate(Gull4_marker = as.numeric(Gull4_marker)) 
-    
-mst <- mst |> 
-  group_by(date) |> 
-  summarize(mst_human = mean(HF183_human),
-            mst_gull = mean(Gull4_marker)) |> 
-  ungroup()
-
-mst <- mst |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
-
-survey_data <- left_join(survey_data, mst, by = "date")
 
 ## Reformat participants in survey that participated more than once 
 
@@ -299,8 +254,9 @@ survey_data$participant_id <- paste("MB_2024", survey_data$participant_id, sep =
 survey_data <- survey_data |> 
   relocate(row_id, .after = participant_id)
 
-data_TO <- subset(survey_data, select = -c(email.x, email.y, phone))
+data_MB <- subset(survey_data, select = -c(email.x, email.y, phone))
 
 remove(beach, follow, investigate, survey_data)
 
+data_MB |> export(here("Datasets", "Manitoba", "data_MB.csv"))
 
