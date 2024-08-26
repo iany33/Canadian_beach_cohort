@@ -21,6 +21,8 @@ data_MB <- import(here("Datasets", "Manitoba", "data_MB.csv"))
 
 data_MB <- data_MB |> mutate(ethnicity_indigenous = as.factor(ethnicity_indigenous))
 
+data_VAN <- data_VAN |> mutate(misswork_days = as.character(misswork_days))
+
 data <- full_join(data_MB, data_VAN)
 
 # Create variable to determine if follow-up was complete or not
@@ -76,47 +78,47 @@ data <- data |>
 # Create 7-day outcome/illness variables 
 
 data <- data |> 
-  mutate(symp_inc = symp_date-date) 
+  mutate(symp_inc = as.numeric(symp_date-date)) 
 
 data <- data |> 
   mutate(agi = case_when(
-    (symptoms_diar == "diarrhea" & symp_inc <=7) ~ 1,
-    (symptoms_vomit == "vomiting" & symp_inc <=7) ~ 1,
-    (symptoms_cramps == "cramps" & symptoms_naus == "nausea" & symp_inc <=7) ~ 1,
-    (symptoms_cramps == "cramps" & symp_inc <=7 & misswork == 1) ~ 1,
-    (symptoms_naus == "nausea" & symp_inc <=7 & misswork == 1) ~ 1,
+    (symptoms_diar == "diarrhea" & symp_inc <=7 & symp_inc >=0) ~ 1,
+    (symptoms_vomit == "vomiting" & symp_inc <=7 & symp_inc >=0) ~ 1,
+    (symptoms_cramps == "cramps" & symptoms_naus == "nausea" & symp_inc <=7 & symp_inc >=0) ~ 1,
+    (symptoms_cramps == "cramps" & symp_inc <=7 & symp_inc >=0 & misswork == 1) ~ 1,
+    (symptoms_naus == "nausea" & symp_inc <=7 & symp_inc >=0 & misswork == 1) ~ 1,
     TRUE ~ 0)) |>
   mutate(agi = as.numeric(agi))
 
 data <- data |> 
   mutate(respiratory = case_when(
-    (symptoms_cough == "cough" & symp_inc <=7) ~ 1,
-    (symptoms_fever == "fever" & symptoms_throat == "throat" & symp_inc <=7) ~ 1,
-    (symptoms_fever == "fever" & symptoms_nose == "nose" & symp_inc <=7) ~ 1,
+    (symptoms_cough == "cough" & symp_inc <=7 & symp_inc >=0) ~ 1,
+    (symptoms_fever == "fever" & symptoms_throat == "throat" & symp_inc <=7 & symp_inc >=0) ~ 1,
+    (symptoms_fever == "fever" & symptoms_nose == "nose" & symp_inc <=7 & symp_inc >=0) ~ 1,
     TRUE ~ 0)) |>
   mutate(respiratory = as.numeric(respiratory))
 
 data <- data |> 
   mutate(ear_infection = case_when(
-    (symptoms_ear == "ear" & symp_inc <=7) ~ 1,
+    (symptoms_ear == "ear" & symp_inc <=7 & symp_inc >=0) ~ 1,
     TRUE ~ 0)) |>
   mutate(ear_infection = as.numeric(ear_infection))
 
 data <- data |> 
   mutate(eye_infection = case_when(
-    (symptoms_eye == "eye" & symp_inc <=7) ~ 1,
+    (symptoms_eye == "eye" & symp_inc <=7 & symp_inc >=0) ~ 1,
     TRUE ~ 0)) |>
   mutate(eye_infection = as.numeric(eye_infection))
 
 data <- data |> 
   mutate(skin_infection = case_when(
-    (symptoms_rash == "rash" & symp_inc <=7) ~ 1,
+    (symptoms_rash == "rash" & symp_inc <=7 & symp_inc >=0) ~ 1,
     TRUE ~ 0)) |>
   mutate(skin_infection = as.numeric(skin_infection))
 
 data <- data |> 
   mutate(diarrhea = case_when(
-    (symptoms_diar == "diarrhea" & symp_inc <=7) ~ 1,
+    (symptoms_diar == "diarrhea" & symp_inc <=7 & symp_inc >=0) ~ 1,
     TRUE ~ 0)) |>
   mutate(diarrhea = as.numeric(diarrhea))
 
@@ -240,8 +242,7 @@ data <- data |> mutate(prev_act1 = case_when(prev_act1 == 1 ~ "Yes", prev_act1 =
   mutate(prev_act1 = as.factor(prev_act1))
 
 data <- data |> mutate(water_contact = case_when(water_contact == 1 ~ "Yes", 
-                                                 water_contact == "NA" ~ NA_character_, 
-                                                 TRUE ~ "No")) |>
+                                                 water_contact == 0 ~ "No")) |>
   mutate(water_contact = as.factor(water_contact))
 
 data <- data |> mutate(sand1 = case_when(sand1 == 1 ~ "Yes", sand1 == "NA" ~ NA_character_, TRUE ~ "No")) |>
@@ -488,6 +489,9 @@ data <- data |>
   mutate(water_contact2 = as.factor(water_contact2)) |> 
   mutate(water_contact2 = fct_relevel(water_contact2, "No contact", "Minimal contact")) 
 
+data |> tabyl(water_contact)
+data |> tabyl(water_contact2)
+
 data <- data |> 
   mutate(water_sports = case_when(
     (water_act_surf == "Yes" | water_act_kite == "Yes" | water_act_wind == "Yes" | water_act_wake == "Yes" | 
@@ -518,21 +522,29 @@ data <- data |>
     date == "2023-07-03" ~ "Yes",
     TRUE ~ "No")) 
     
-# Create log E. coli variable and standardized version
+# Create mean centered and standardized E. coli and other water variables
 
 data <- data |> 
-  mutate(log_ecoli = log(e_coli))
+  mutate(log_e_coli = log(e_coli + 1))
+
+data <- data |> 
+  mutate(log_e_coli_s = (log_e_coli - mean(log_e_coli, na.rm = TRUE)) / sd(log_e_coli, na.rm = TRUE))
 
 data <- data |> 
   mutate(e_coli_s = (e_coli - mean(e_coli, na.rm = TRUE)) / sd(e_coli, na.rm = TRUE))
 
+data <- data |> 
+  mutate(e_coli_max_s = (e_coli_max - mean(e_coli_max, na.rm = TRUE)) / sd(e_coli_max, na.rm = TRUE))
+
+data <- data |> 
+  mutate(turbidity_s = (turbidity - mean(turbidity, na.rm = TRUE)) / sd(turbidity, na.rm = TRUE))
+
 # Create E. coli threshold variables
 
 data <- data |> 
-  mutate(ecoli_100 = if_else(e_coli >=100, "Yes", "No"))
-
-data <- data |> 
-  mutate(ecoli_200 = if_else(e_coli >=200, "Yes", "No"))
+  mutate(ecoli_100 = if_else(e_coli >=100, "Yes", "No"),
+         ecoli_200 = if_else(e_coli >=200, "Yes", "No"),
+         ecoli_bav = if_else(e_coli_max >=235, "Yes", "No"))
 
 # Create standardized and binary MST variables
 
@@ -550,10 +562,17 @@ data <- data |>
   mutate(mst_gull2 = case_when(
   mst_gull > 0 ~ "Yes", TRUE ~ "No"))
 
+# Extract year as factor
+
+data <- data |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d"),
+         year = year(date))
+
 # Create dataset of those who completed follow-up survey
 
 data_follow <- data |> filter(follow == "Yes") 
 
-# Export dataset
+# Export data
 
-export(data, "data_2024.xlsx")
+data |> export(here("data_2024.xlsx"))
+

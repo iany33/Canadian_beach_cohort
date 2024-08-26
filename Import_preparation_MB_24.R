@@ -15,8 +15,6 @@ pacman::p_load(
 beach <- import(here("Datasets", "Manitoba", "2024-beach-Manitoba.xlsx"))
 follow <- import(here("Datasets", "Manitoba", "2024-follow-Manitoba.xlsx"))
 
-e_coli <- import(here("Datasets", "Manitoba", "2024-e_coli_Manitoba.xlsx"))
-
 # Clean variable names
 
 beach <- beach  |> clean_names()
@@ -192,36 +190,18 @@ beach <- beach |>
 survey_data <- left_join(beach, follow, by = "name1")
 
 survey_data <- survey_data |> 
-  mutate(date = as.Date(date))  |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d"))  |> 
   mutate(month = as.factor(month(date))) |> 
   mutate(dow = as.factor(wday(date))) # Sunday is 1, Sat. is 7
 
 # Check for duplicate names 
 
-survey_data |> group_by(name1) |> filter(n()>1) |> select(house_id, date, name1)
+survey_data |> group_by(name1) |> filter(n()>1) |> select(house_id, date, name1) |> print(n=30)
 
 ## Check for any follow-up participants that did not match to beach participants
 
 follow |> anti_join(beach, by = "name1") |> select(household_name, submitted_date, name1)
 investigate <- follow |> anti_join(beach, by = "name1")
-
-## Load, Format and Merge Lab Results
-# For now, reformat <10 E. coli to 0 counts to allow averaging and merging with other sites
-
-e_coli <- e_coli |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
-
-e_coli <- e_coli |> 
-  mutate(e_coli1 = ifelse(e_coli1 == "<10", 0, as.numeric(e_coli1)),
-         e_coli2 = ifelse(e_coli2 == "<10", 0, as.numeric(e_coli2)))
-
-e_coli <- e_coli |> rowwise() |>
-  mutate(e_coli = mean(c(e_coli1, e_coli2)))
-
-e_coli <- e_coli |> rowwise() |>
-  mutate(e_coli_max = max(c(e_coli1, e_coli2)))
-
-survey_data <- left_join(survey_data, e_coli, by = "date")
 
 ## Reformat participants in survey that participated more than once 
 
@@ -255,6 +235,14 @@ survey_data <- survey_data |>
   relocate(row_id, .after = participant_id)
 
 data_MB <- subset(survey_data, select = -c(email.x, email.y, phone))
+
+# Create location-recruitment date variable
+
+data_MB <- data_MB |> 
+  mutate(recruit_date = paste("MB", date, sep = "_")) |> 
+  relocate(recruit_date, .after = date)
+
+# Remove unnecessary dataframes, save/export data
 
 remove(beach, follow, investigate, survey_data)
 

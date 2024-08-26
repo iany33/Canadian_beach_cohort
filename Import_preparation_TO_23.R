@@ -15,9 +15,6 @@ pacman::p_load(
 beach <- import(here("Datasets", "Toronto", "2023-beach.xlsx"))
 follow <- import(here("Datasets", "Toronto", "2023-follow.xlsx"))
 
-e_coli <- import(here("Datasets", "Toronto", "2023_e_coli.xlsx"))
-mst <- import(here("Datasets", "Toronto", "2023_mst_data.xlsx"))
-
 # Clean variable names
 
 beach <- beach  |> clean_names()
@@ -169,7 +166,7 @@ beach <- beach |>
 survey_data <- left_join(beach, follow, by = "name1")
 
 survey_data <- survey_data |> 
-  mutate(date = as.Date(date))  |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d"))  |> 
   mutate(month = as.factor(month(date))) |> 
   mutate(dow = as.factor(wday(date))) # Sunday is 1, Sat. is 7
 
@@ -187,67 +184,6 @@ survey_data |> group_by(name1) |> filter(n()>1)
 
 follow |> anti_join(beach, by = "name1")
 investigate <- follow |> anti_join(beach, by = "name1")
-
-## Load, Format and Merge E. coli data
-
-e_coli <- e_coli |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
-
-MC_data <- import(here("Datasets", "Toronto", "2023-MC.xlsx"))
-SS_data <- import(here("Datasets", "Toronto", "2023-SS.xlsx"))
-
-MC_data <- MC_data |> 
-  group_by(date) |> 
-  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
-  distinct(date, e_coli) |> 
-  ungroup()
-
-MC_data <- MC_data |> 
-  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
-
-SS_data <- SS_data |> 
-  group_by(date) |> 
-  mutate(e_coli = geometric.mean(as.numeric(e_coli), na.rm = TRUE)) |> 
-  distinct(date, e_coli) |> 
-  ungroup()
-
-SS_data <- SS_data |> 
-  mutate(prev_day_ecoli = lag(as.numeric(e_coli))) |> 
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) 
-
-e_coli1 <- e_coli |> filter(beach == "Marie Curtis") |> 
-  left_join(MC_data, by = "date")
-
-e_coli2 <- e_coli |> filter(beach == "Sunnyside") |> 
-  left_join(SS_data, by = "date") 
-
-e_coli <- rbind(e_coli1, e_coli2)
-
-e_coli <- e_coli |> arrange(date)
-
-remove(MC_data, SS_data, e_coli1, e_coli2)
-
-survey_data <- left_join(survey_data, e_coli, by = "date")
-
-# Format MST data
-
-mst <- mst |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) |> 
-  mutate_all(function(x) gsub("BD", 0, x)) |> 
-  mutate(HF183_human = as.numeric(HF183_human)) |> 
-  mutate(Gull4_marker = as.numeric(Gull4_marker)) 
-    
-mst <- mst |> 
-  group_by(date) |> 
-  summarize(mst_human = mean(HF183_human),
-            mst_gull = mean(Gull4_marker)) |> 
-  ungroup()
-
-mst <- mst |> 
-  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
-
-survey_data <- left_join(survey_data, mst, by = "date")
 
 ## Reformat participants in survey that participated more than once 
 
@@ -282,7 +218,15 @@ survey_data <- survey_data |>
 
 data_TO <- subset(survey_data, select = -c(email.x, email.y, phone))
 
+# Create location-recruitment date variable
+
+data_TO <- data_TO |> 
+  mutate(recruit_date = paste("TO", date, sep = "_")) |> 
+  relocate(recruit_date, .after = date)
+
+# Remove unnecessary dataframes, save/export data
+
 remove(beach, follow, investigate, survey_data)
 
-export(data_TO)
+data_TO |> export(here("Datasets", "Toronto", "data_TO.csv"))
 

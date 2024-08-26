@@ -104,9 +104,10 @@ data |>
 #| echo: false
 #| warning: false
 data |> 
+  filter(year == 2024) |> 
   ggplot(aes(x = as.Date(date), y = e_coli, shape = beach, colour = beach)) +
   geom_point() +
-  geom_errorbar(aes(ymin=abs(e_coli1), ymax=abs(e_coli2))) +
+  geom_errorbar(aes(ymin=e_coli_min, ymax=e_coli_max)) +
   scale_x_date(date_labels="%d %b", date_breaks = "3 days") +
   labs(y = "E. coli levels (CFU / 100 mL)", x = "Recruitment date",
        shape = "Beach", colour = "Beach") +
