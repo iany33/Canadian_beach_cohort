@@ -10,6 +10,28 @@ pacman::p_load(
   viridis
 )
 
+# Descriptive cross-tabs
+
+data |> 
+  select(age2, gender, education2, ethnicity) |> 
+  tbl_summary(digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+
+data |> 
+  select(age2, gender, education2, ethnicity, water_contact) |> 
+  tbl_summary(by = water_contact, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+
+data |> 
+  select(age2, gender, education2, ethnicity, water_exp_body) |> 
+  tbl_summary(by = water_exp_body, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+
+data |> 
+  select(age2, gender, education2, ethnicity, water_exp_mouth) |> 
+  tbl_summary(by = water_exp_mouth, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+
 # Histograms
 
 data |> group_by(date) |> ggplot(aes(x = e_coli)) + geom_histogram()
@@ -55,6 +77,15 @@ data_follow |>
               type = all_categorical() ~ "categorical")
 
 data_follow |> 
+  ggplot(aes(x = agi3, y = water_time, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "Time in the water (min)")
+
+data_follow |> 
   ggplot(aes(x = agi3, y = e_coli, fill = agi3)) +
   geom_violin() +
   geom_boxplot(width = 0.1) +
@@ -62,7 +93,7 @@ data_follow |>
   scale_fill_viridis_d(option = "cividis") +
   labs(x = "Acute gastrointestinal illness (AGI)",
        y = "E. coli geometric mean") +
-  facet_wrap(~water_contact2)
+  facet_grid(~water_contact2)
 
 data_follow |> 
   ggplot(aes(x = agi3, y = e_coli_max, fill = agi3)) +
@@ -72,7 +103,7 @@ data_follow |>
   scale_fill_viridis_d(option = "cividis") +
   labs(x = "Acute gastrointestinal illness (AGI)",
        y = "E. coli highest single sample") +
-  facet_wrap(~water_contact2)
+  facet_grid(~water_contact2)
 
 data_follow |> 
   ggplot(aes(x = agi3, y = mst_human, fill = agi3)) +
@@ -147,6 +178,10 @@ data_follow |>
 
 # Descriptive summaries of water quality indicators by outcomes
 
+data_follow |> select(agi3, ecoli_100, ecoli_200, ecoli_bav, ecoli_500, ecoli_1000) |> 
+  tbl_summary(by = agi3, digits = list(all_categorical() ~ c(0, 1)),
+              type = all_categorical() ~ "categorical")
+
 data_follow |> 
   select(agi3, mst_human2) |> 
   tbl_summary(by = mst_human2, digits = list(all_categorical() ~ c(0, 1)),
@@ -204,6 +239,11 @@ data |> select(water_contact, water_act_swim, water_act_wade, water_contact2, ec
 data |> select(water_contact, water_act_swim, water_act_wade, water_contact2, ecoli_200) |> 
   tbl_summary(by = ecoli_200, digits = list(all_categorical() ~ c(0, 1)),
               type = all_categorical() ~ "categorical")
+
+data |> select(water_contact, water_act_swim, water_act_wade, water_contact2, ecoli_bav) |> 
+  tbl_summary(by = ecoli_bav, digits = list(all_categorical() ~ c(0, 1)),
+              type = all_categorical() ~ "categorical")
+
 
 # Examine any illness outcomes
 

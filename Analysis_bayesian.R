@@ -14,42 +14,6 @@ pacman::p_load(
   modelr
 )
 
-# Add remaining datasets together
-
-data <- data |> mutate(
-  across(contains("consent"), as.character),
-  water_time = as.character(water_time),
-  others = as.character(others),
-  rec_act1 = as.character(rec_act1),
-  symp_date = as.character(symp_date),
-  misswork_days = as.character(misswork_days),
-  others_follow = as.character(others_follow),
-  month = as.factor(month),
-  dow = as.factor(dow),
-  date = as.Date(date, "%Y-%m-%d"),
-  prev_act1 = as.character(prev_act1),
-  water_contact = as.character(water_contact),
-  sand1 = as.character(sand1),
-  sand_mouth1 = as.character(sand_mouth1), 
-  misswork = as.character(misswork),
-  blood_stool1 = as.character(blood_stool1),
-  stool_test1 = as.character(stool_test1),
-  healthcare1 = as.character(healthcare1),
-  emergency = as.character(emergency),
-  hospital = as.character(hospital))
-
-data_TO <- import(here("Datasets", "Toronto", "data_TO.csv"))
-
-data_TO <- data_TO |> mutate(
-  date = as.Date(date, "%Y-%m-%d"))
-
-data_TO <- data_TO |> mutate(
-  misswork_days = as.character(misswork_days))
-
-data <- full_join(data, data_TO)
-
-data_follow <- data |> filter(follow == "Yes") 
-
 # Start with AGI outcome, first build model with no confounders then add confounders
 # Varying-effects for date, household, beach (hierarchical) - ignore site as 4th level for now
 # Use weakly informative priors for water contact; standard 0,1 Normal prior for other covariates
@@ -150,6 +114,7 @@ pp_check(m3, ndraws=100)
 pp_check(m3, type = "stat", stat = "mean")
 
 conditional_effects(m2, effects = "e_coli_s:water_contact3")
+conditional_effects(m2, effects = "water_contact3")
 
 plot_predictions(m3, re_formula=NA, condition = c("e_coli_s", "water_contact3"))
 

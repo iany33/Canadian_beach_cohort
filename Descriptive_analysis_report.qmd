@@ -19,7 +19,7 @@ pacman::p_load(
   flextable
 )
 
-data <- import(here("data_2024.xlsx"))
+data <- import(here("data.xlsx"))
 
 num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
 num_participants <- data |> summarize(count = n())
@@ -145,7 +145,7 @@ data_follow |>
 
 ```{r}
 #| echo: false
-data_follow |> 
+data_follow |>
   select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, illness_any,
          water_contact) |> 
   tbl_summary(by = water_contact, digits = list(all_categorical() ~ c(0, 1))) |> 

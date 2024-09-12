@@ -18,12 +18,11 @@ pacman::p_load(
 
 data_VAN <- import(here("Datasets", "Vancouver", "data_VAN.csv"))
 data_MB <- import(here("Datasets", "Manitoba", "data_MB.csv"))
+data_TO <- import(here("Datasets", "Toronto", "data_TO.csv"))
 
 data_MB <- data_MB |> mutate(ethnicity_indigenous = as.factor(ethnicity_indigenous))
 
-data_VAN <- data_VAN |> mutate(misswork_days = as.character(misswork_days))
-
-data <- full_join(data_MB, data_VAN)
+data <- bind_rows(data_MB, data_VAN, data_TO)
 
 # Create variable to determine if follow-up was complete or not
 
@@ -544,7 +543,9 @@ data <- data |>
 data <- data |> 
   mutate(ecoli_100 = if_else(e_coli >=100, "Yes", "No"),
          ecoli_200 = if_else(e_coli >=200, "Yes", "No"),
-         ecoli_bav = if_else(e_coli_max >=235, "Yes", "No"))
+         ecoli_bav = if_else(e_coli_max >=235, "Yes", "No"),
+         ecoli_500 = if_else(e_coli >=500, "Yes", "No"),
+         ecoli_1000 = if_else(e_coli >=1000, "Yes", "No"))
 
 # Create standardized and binary MST variables
 
@@ -574,5 +575,5 @@ data_follow <- data |> filter(follow == "Yes")
 
 # Export data
 
-data |> export(here("data_2024.xlsx"))
+data |> export(here("data.xlsx"))
 
