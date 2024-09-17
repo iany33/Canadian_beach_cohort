@@ -237,8 +237,9 @@ data <- data |> mutate(eth_white = case_when(ethnicity_white == "white" ~ "Yes",
 data <- data |> mutate(eth_other = case_when(ethnicity_other == "other_eth" ~ "Yes", TRUE ~ "No")) |>
   mutate(eth_other = as.factor(eth_other))
 
-data <- data |> mutate(prev_act1 = case_when(prev_act1 == 1 ~ "Yes", prev_act1 == "NA" ~ NA_character_, TRUE ~ "No")) |>
-  mutate(prev_act1 = as.factor(prev_act1))
+data <- data |> mutate(other_rec_act = case_when((prev_act1 == 1 | rec_act1 == 1) ~ "Yes", 
+                                             TRUE ~ "No")) |>
+  mutate(prev_act1 = as.factor(other_rec_act))
 
 data <- data |> mutate(water_contact = case_when(water_contact == 1 ~ "Yes", 
                                                  water_contact == 0 ~ "No")) |>
@@ -407,6 +408,8 @@ data <- data |>
 
 # Recode some socio-demographic variables
 
+data <- data |> mutate(age1 = if_else(age1 == "", NA, age1))
+
 data <- data |> 
   mutate(age1 = fct_relevel(age1, "5-9", after = 1)) |> 
   mutate(education = fct_relevel(education, "none", "secondary", "apprenticeship", "college", "bachelors", "graduate"))
@@ -547,6 +550,20 @@ data <- data |>
          ecoli_500 = if_else(e_coli >=500, "Yes", "No"),
          ecoli_1000 = if_else(e_coli >=1000, "Yes", "No"))
 
+data <- data |> mutate(ecoli_thresholds = case_when(
+  e_coli <= 10 ~ "<=10",
+  (e_coli >10 & e_coli <=100) ~ "11-100",
+  (e_coli >100 & e_coli <=200) ~ "101-200",
+  (e_coli >200 & e_coli <=300) ~ "201-300",
+  (e_coli >300 & e_coli <=400) ~ "301-400",
+  (e_coli >400 & e_coli <=500) ~ "401-500",
+  (e_coli >501 & e_coli <=1000) ~ "501-1000",
+  e_coli >1000 ~ ">1000"))
+
+data <- data |> mutate(ecoli_thresholds = factor(ecoli_thresholds, ordered = T, 
+                     levels = c("<=10", "11-100", "101-200", "201-300", "301-400", 
+                                "401-500", "501-1000", ">1000")))
+                           
 # Create standardized and binary MST variables
 
 data <- data |> 

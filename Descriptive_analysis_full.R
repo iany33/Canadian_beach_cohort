@@ -77,15 +77,6 @@ data_follow |>
               type = all_categorical() ~ "categorical")
 
 data_follow |> 
-  ggplot(aes(x = agi3, y = water_time, fill = agi3)) +
-  geom_violin() +
-  geom_boxplot(width = 0.1) +
-  theme(legend.position = "none") +
-  scale_fill_viridis_d(option = "cividis") +
-  labs(x = "Acute gastrointestinal illness (AGI)",
-       y = "Time in the water (min)")
-
-data_follow |> 
   ggplot(aes(x = agi3, y = e_coli, fill = agi3)) +
   geom_violin() +
   geom_boxplot(width = 0.1) +
@@ -93,6 +84,16 @@ data_follow |>
   scale_fill_viridis_d(option = "cividis") +
   labs(x = "Acute gastrointestinal illness (AGI)",
        y = "E. coli geometric mean") +
+  facet_grid(~water_contact2)
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = log_e_coli, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "Log E. coli geometric mean") +
   facet_grid(~water_contact2)
 
 data_follow |> 
@@ -175,6 +176,44 @@ data_follow |>
        y = "Previous Day E. coli Geometric Mean") +
   facet_wrap(~water_contact2)
 
+# Plot other water contact variables
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = water_time, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "Time in the water (min)")
+
+data_follow |> 
+  ggplot(aes(x = water_time, y = e_coli, colour = agi3)) +
+  geom_point() +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Time in the water (min)",
+       y = "E. coli Geometric Mean")
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = e_coli, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "E. coli geometric mean") +
+  facet_grid(~water_exp_body)
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = e_coli, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "E. coli geometric mean") +
+  facet_grid(~water_exp_mouth)
 
 # Descriptive summaries of water quality indicators by outcomes
 

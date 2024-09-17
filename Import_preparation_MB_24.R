@@ -213,6 +213,8 @@ investigate <- survey_data |>
   filter(n!=1) |> 
   select (-n)
 
+investigate |> export(here("Datasets", "Manitoba", "investigate.csv"))
+
 survey_data <- survey_data |>
   group_by(name1) |>
   mutate(house_id = first(house_id)) |>
