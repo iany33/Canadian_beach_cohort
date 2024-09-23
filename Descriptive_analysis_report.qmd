@@ -19,7 +19,7 @@ pacman::p_load(
   flextable
 )
 
-data <- import(here("data.xlsx"))
+data <- import(here("Datasets", "data.xlsx"))
 
 num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
 num_participants <- data |> summarize(count = n())

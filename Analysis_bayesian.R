@@ -125,7 +125,7 @@ data_follow$ethnicity <- C(data_follow$ethnicity, contr.treatment, base=9)
 m3 <- brm(agi3 ~ mo(water_contact3)*e_coli_s + age1 + gender + education2 + ethnicity + cond_GI + 
             other_rec_act + beach_exp_food + sand_contact + (1 | beach/recruit_date/house_id),
           family = bernoulli, data = data_follow, prior = priors2,
-          iter = 2000, chains = 4, cores = 4, warmup = 1000, seed = 123, control = list(adapt_delta = 0.9),
+          iter = 2000, chains = 4, cores = 4, warmup = 1000, seed = 123, control = list(adapt_delta = 0.95),
           backend = "cmdstanr", stan_model_args = list(stanc_options = list("O1")))
 
 summary(m3)
@@ -137,6 +137,25 @@ pp_check(m3, type = "stat", stat = "mean")
 conditional_effects(m3, effects = "e_coli_s:water_contact3")
 conditional_effects(m3, effects = "water_contact3")
 
+# Compare again to using simpler model with no monotonic effects for water contact
+
+priors3 <- c(set_prior("normal(0.3, 0.6)", class = "b", coef = "water_contact2Minimalcontact"),
+            set_prior("normal(0.5, 0.5)", class = "b", coef = "water_contact2Bodyimmersion"),
+            set_prior("normal(0.7, 0.4)", class = "b", coef = "water_contact2Swallowedwater"),
+            set_prior("normal(0, 1)", class = "b"))
+
+m3.1 <- brm(agi3 ~ water_contact2*e_coli_s + age1 + gender + education2 + ethnicity + cond_GI + 
+            other_rec_act + beach_exp_food + sand_contact + (1 | beach/recruit_date/house_id),
+          family = bernoulli, data = data_follow, prior = priors3,
+          iter = 2000, chains = 4, cores = 4, warmup = 1000, seed = 123, control = list(adapt_delta = 0.9),
+          backend = "cmdstanr", stan_model_args = list(stanc_options = list("O1")))
+
+conditional_effects(m3.1, effects = "e_coli_s:water_contact2")
+conditional_effects(m3.1, effects = "water_contact2")
+
+loo(m3, m3.1)
+
+# Monotonic predictor still fits better
 
 
 ### Conditional and marginal effects with 'marginaleffects' R package
@@ -164,7 +183,7 @@ ggplot(pred, aes(x = draw, y = water_contact3, fill = water_contact3)) +
        subtitle = "Posterior Predictions", fill = "Water contact") +
   theme_minimal() +
   theme(legend.position = "none") +
-  xlim(0, 25)
+  xlim(0, 40)
 
 # Examine marginal effects/contrast of water contact exposure effect - probability scale
 
@@ -182,7 +201,7 @@ ggplot(mfx, aes(x = draw, y = contrast, fill = contrast)) +
   labs(x = "Effect of Water Contact on AGI Incidence per 1000 Beachgoers", y = "") +
   theme_minimal() +
   theme(legend.position = "bottom") +
-  xlim(-0.5, 4) 
+  xlim(-0.5, 20) 
 
 # Odds ratio scale
 
