@@ -32,6 +32,11 @@ data |>
   tbl_summary(by = water_exp_mouth, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 
+data |> 
+  select(age3, water_contact, water_exp_body, water_exp_mouth) |> 
+  tbl_summary(by = age3, digits = list(all_categorical() ~ c(0, 1))) |> 
+  as_flex_table() 
+
 # Histograms
 
 data |> group_by(date) |> ggplot(aes(x = e_coli)) + geom_histogram()
