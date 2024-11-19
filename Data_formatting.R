@@ -523,6 +523,19 @@ data <- data |>
     (dow == 1 | dow == 7) ~ "Yes",
     date == "2023-07-03" ~ "Yes",
     TRUE ~ "No")) 
+
+# Check household sizes; create indicator for participants that were part of a household cluster
+
+house_size_tab <- data |> group_by(house_id) |> 
+  mutate(n = n(), house_size = case_when(
+    n == 1 ~ 1, n == 2 ~ 2, n == 3 ~ 3,
+    n == 4 ~ 4, n == 5 ~ 5, n == 6 ~ 6)) |> 
+  tabyl(house_size)
+
+data <- data |> 
+  group_by(house_id) |> 
+  mutate(household_group = +(n() >1)) |> 
+  ungroup() 
     
 # Create mean centered and standardized E. coli and other water variables
 

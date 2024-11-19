@@ -23,7 +23,8 @@ get_prior(agi3 ~ water_contact2 + (1 | beach/recruit_date/house_id),
 
 priors <- c(set_prior("normal(0.3, 0.6)", class = "b", coef = "water_contact2Minimalcontact"),
             set_prior("normal(0.5, 0.5)", class = "b", coef = "water_contact2Bodyimmersion"),
-            set_prior("normal(0.7, 0.4)", class = "b", coef = "water_contact2Swallowedwater"))
+            set_prior("normal(0.7, 0.4)", class = "b", coef = "water_contact2Swallowedwater"),
+            set_prior("exponential(1)", class = "sd"))
 
 m1 <- brm(agi3 ~ water_contact2 + (1 | beach/recruit_date/house_id),
           family = bernoulli, data = data_follow, prior = priors, control = list(adapt_delta = 0.9),
@@ -62,6 +63,7 @@ dirichlet |>
 # Set priors and run model
 
 priors2 <- c(set_prior("normal(0,1)",class= "b"),
+             set_prior("exponential(1)", class = "sd"),
              set_prior("dirichlet(c(1, 2, 3))", class = "simo", coef = "mowater_contact31"))
 
 m1.2 <- brm(agi3 ~ mo(water_contact3) + (1 | beach/recruit_date/house_id),
@@ -98,6 +100,8 @@ pp_check(m2, type = "stat", stat = "mean")
 conditional_effects(m2, effects = "e_coli_s:water_contact3")
 conditional_effects(m2, effects = "water_contact3")
 
+loo(m2)
+
 # Compare to model with no interaction
 
 m2.1 <- brm(agi3 ~ mo(water_contact3) + e_coli_s + (1 | beach/recruit_date/house_id),
@@ -111,8 +115,8 @@ plot(m2.1)
 pp_check(m2.1, ndraws=100)
 pp_check(m2.1, type = "stat", stat = "mean")
 
-conditional_effects(m2, effects = "e_coli_s:water_contact3")
-conditional_effects(m2, effects = "water_contact3")
+conditional_effects(m2.1, effects = "e_coli_s:water_contact3")
+conditional_effects(m2.1, effects = "water_contact3")
 
 loo(m2, m2.1)
 
@@ -135,25 +139,52 @@ pp_check(m3, ndraws=100)
 pp_check(m3, type = "stat", stat = "mean")
 
 conditional_effects(m3, effects = "e_coli_s:water_contact3")
-conditional_effects(m3, effects = "water_contact3")
+conditional_effects(m3, effects = "water_contact3") -> fit
+fit$water_contact3
+
+loo(m3)
+
+# Given very low posterior predictions and high Pareto K values due to ~50% of households having n=1
+# Re-run model without the household cluster and instead include indicator for household size >1
+
+m4 <- brm(agi3 ~ mo(water_contact3)*e_coli_s + age1 + gender + education2 + ethnicity + cond_GI + 
+            other_rec_act + beach_exp_food + sand_contact + household_group +
+            (1 | beach/recruit_date),
+          family = bernoulli, data = data_follow, prior = priors2,
+          iter = 2000, chains = 4, cores = 4, warmup = 1000, seed = 123, control = list(adapt_delta = 0.9),
+          backend = "cmdstanr", stan_model_args = list(stanc_options = list("O1")))
+
+summary(m4)
+get_variables(m4)
+plot(m4)
+pp_check(m4, ndraws=100)
+pp_check(m4, type = "stat", stat = "mean")
+
+conditional_effects(m4, effects = "e_coli_s:water_contact3")
+conditional_effects(m4, effects = "water_contact3") -> fit
+fit$water_contact3
+
+loo(m3, m4)
 
 # Compare again to using simpler model with no monotonic effects for water contact
 
 priors3 <- c(set_prior("normal(0.3, 0.6)", class = "b", coef = "water_contact2Minimalcontact"),
-            set_prior("normal(0.5, 0.5)", class = "b", coef = "water_contact2Bodyimmersion"),
-            set_prior("normal(0.7, 0.4)", class = "b", coef = "water_contact2Swallowedwater"),
-            set_prior("normal(0, 1)", class = "b"))
+             set_prior("normal(0.5, 0.5)", class = "b", coef = "water_contact2Bodyimmersion"),
+             set_prior("normal(0.7, 0.4)", class = "b", coef = "water_contact2Swallowedwater"),
+             set_prior("normal(0, 1)", class = "b"),
+             set_prior("exponential(1)", class = "sd"))
 
-m3.1 <- brm(agi3 ~ water_contact2*e_coli_s + age1 + gender + education2 + ethnicity + cond_GI + 
-            other_rec_act + beach_exp_food + sand_contact + (1 | beach/recruit_date/house_id),
-          family = bernoulli, data = data_follow, prior = priors3,
-          iter = 2000, chains = 4, cores = 4, warmup = 1000, seed = 123, control = list(adapt_delta = 0.9),
-          backend = "cmdstanr", stan_model_args = list(stanc_options = list("O1")))
+m4.1 <- brm(agi3 ~ water_contact2*e_coli_s + age1 + gender + education2 + ethnicity + cond_GI + 
+              other_rec_act + beach_exp_food + sand_contact + household_group +
+              (1 | beach/recruit_date),
+            family = bernoulli, data = data_follow, prior = priors3,
+            iter = 2000, chains = 4, cores = 4, warmup = 1000, seed = 123, control = list(adapt_delta = 0.9),
+            backend = "cmdstanr", stan_model_args = list(stanc_options = list("O1")))
 
-conditional_effects(m3.1, effects = "e_coli_s:water_contact2")
-conditional_effects(m3.1, effects = "water_contact2")
+conditional_effects(m4.1, effects = "e_coli_s:water_contact2")
+conditional_effects(m4.1, effects = "water_contact2")
 
-loo(m3, m3.1)
+loo(m4, m4.1)
 
 # Monotonic predictor still fits better
 
@@ -183,7 +214,7 @@ ggplot(pred, aes(x = draw, y = water_contact3, fill = water_contact3)) +
        subtitle = "Posterior Predictions", fill = "Water contact") +
   theme_minimal() +
   theme(legend.position = "none") +
-  xlim(0, 40)
+  xlim(0, 100)
 
 # Examine marginal effects/contrast of water contact exposure effect - probability scale
 
@@ -291,16 +322,16 @@ ggplot(mfx, aes(x = draw, y = water_contact3, fill = factor(e_coli))) +
        fill = "") +
   theme_classic() +
   theme(legend.position = "bottom") +
-  xlim(-0.025, 0.05)
+  xlim(-0.025, 0.05) +
+  facet_wrap(~ factor(e_coli)) 
 
 ### Beach-specific posterior probabilities 
-# Note that predictions may take some time to compute with random-effects accounted for
 
 nd <- data_follow |> 
   data_grid(water_contact3 = c("No contact", "Minimal contact", "Body immersion", "Swallowed water"),
             e_coli_s = mean(e_coli_s, na.rm=TRUE), age1 = "15-19", gender = "woman/girl", 
             ethnicity = "White", education2 = "bachelors", cond_GI = "No", other_rec_act = "Yes", 
-            beach_exp_food = "Yes", sand_contact = "No", 
+            beach_exp_food = "Yes", sand_contact = "No",
             beach = c("English Bay Beach", "Kitsilano Beach", "Grand Beach West", "Grand Beach East",
                       "Sunnyside", "Marie Curtis")) 
 
@@ -317,7 +348,7 @@ ggplot(pred, aes(x = draw, y = beach, fill = water_contact3)) +
        subtitle = "Posterior Predictions", fill = "Water contact") +
   theme_minimal() +
   theme(legend.position = "bottom") +
-  xlim(0, 25)
+  xlim(0, 100)
 
 ggplot(pred, aes(x = draw, y = water_contact3, fill = water_contact3)) +
   stat_halfeye(slab_alpha = .5)  +
@@ -325,7 +356,7 @@ ggplot(pred, aes(x = draw, y = water_contact3, fill = water_contact3)) +
        subtitle = "Posterior Predictions", fill = "Water contact") +
   theme_minimal() +
   theme(legend.position = "none") +
-  xlim(0, 25) +
+  xlim(0, 100) +
   facet_wrap(~ beach)
 
 
