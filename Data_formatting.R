@@ -457,6 +457,17 @@ data <- data |>
   mutate(age3 = fct_relevel(age3, "15+", "0-14"))
 
 data <- data |> 
+  mutate(age4 = case_when(
+    age1 == "0-4" ~ "0-4",
+    age1 == "5-9" ~ "5-9",
+    age1 == "10-14" ~ "10-14",
+    age1 == "15-19" ~ "15-19",
+    (age1 == "20-39" | age1 == "40-59" | age1 == "60+") ~ "20+",   
+    TRUE ~ NA_character_))  |>
+  mutate(age4 = as.factor(age4)) |> 
+  mutate(age4 = fct_relevel(age4, "20+", "0-4", "5-9"))
+
+data <- data |> 
   mutate(ethnicity = case_when(
     ethnicity_other == "other_eth" ~ "Multiple ethnicities",
     (eth_white == "Yes" & (eth_south_asian == "Yes" | eth_arab == "Yes" | eth_se_asian == "Yes" | 
@@ -535,6 +546,7 @@ house_size_tab <- data |> group_by(house_id) |>
 data <- data |> 
   group_by(house_id) |> 
   mutate(household_group = +(n() >1)) |> 
+  mutate(household_group = recode(household_group, 0 = "No", 1 = "Yes")) |> 
   ungroup() 
     
 # Create mean centered and standardized E. coli and other water variables

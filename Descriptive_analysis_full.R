@@ -37,6 +37,14 @@ data |>
   tbl_summary(by = age3, digits = list(all_categorical() ~ c(0, 1))) |> 
   as_flex_table() 
 
+# FIB summary stats
+
+old <- options(pillar.sigfig = 5)
+
+data |> 
+  distinct(recruit_date, .keep_all=TRUE) |> 
+  get_summary_stats(e_coli, e_coli_max, turbidity) 
+  
 # Histograms
 
 data |> group_by(date) |> ggplot(aes(x = e_coli)) + geom_histogram()
