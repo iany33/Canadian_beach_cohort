@@ -73,6 +73,11 @@ data <- data |>
     TRUE ~ 0)) |>
   mutate(base_skin = as.numeric(base_skin))
 
+data <- data |> 
+  mutate(base_diarrhea = case_when(
+    base_symp_diar == "diarrhea" ~ 1,
+    TRUE ~ 0)) |>
+  mutate(base_diarrhea = as.numeric(base_diarrhea))
 
 # Create 7-day outcome/illness variables 
 
@@ -175,7 +180,7 @@ data <- data |>
 
 data <- data |> 
   mutate(diarrhea3 = case_when(
-    (diarrhea == 1 & base_symp_diar == 0) ~ "Yes",
+    (diarrhea == 1 & base_diarrhea == 0) ~ "Yes",
     TRUE ~ "No")) |>
   mutate(diarrhea3 = as.factor(diarrhea3))
 
@@ -618,4 +623,3 @@ data_follow <- data |> filter(follow == "Yes")
 # Export data
 
 data |> export(here("Datasets", "data.xlsx"))
-
