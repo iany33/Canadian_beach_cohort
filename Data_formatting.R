@@ -569,6 +569,12 @@ data <- data |>
   mutate(e_coli_max_s = (e_coli_max - mean(e_coli_max, na.rm = TRUE)) / sd(e_coli_max, na.rm = TRUE))
 
 data <- data |> 
+  mutate(mst_human_s = (mst_human - mean(mst_human, na.rm = TRUE)) / sd(mst_human, na.rm = TRUE))
+
+data <- data |> 
+  mutate(mst_gull_s = (mst_gull - mean(mst_gull, na.rm = TRUE)) / sd(mst_gull, na.rm = TRUE))
+
+data <- data |> 
   mutate(turbidity_s = (turbidity - mean(turbidity, na.rm = TRUE)) / sd(turbidity, na.rm = TRUE))
 
 # Create E. coli threshold variables
