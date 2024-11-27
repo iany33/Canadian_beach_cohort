@@ -52,6 +52,9 @@ data |> group_by(date) |> ggplot(aes(x = e_coli_s)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = log_e_coli)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = log_e_coli_s)) + geom_histogram()
 
+data |> group_by(date) |> ggplot(aes(x = mst_human)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = mst_human_s)) + geom_histogram()
+
 data |> group_by(date) |> ggplot(aes(x = turbidity)) + geom_histogram()
 
 # Examine E. coli results by beach
