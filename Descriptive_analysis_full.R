@@ -52,6 +52,11 @@ data |> group_by(date) |> ggplot(aes(x = e_coli_s)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = log_e_coli)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = log_e_coli_s)) + geom_histogram()
 
+data |> group_by(date) |> ggplot(aes(x = entero_cce)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = entero_s)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = log_entero)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = log_entero_s)) + geom_histogram()
+
 data |> group_by(date) |> ggplot(aes(x = mst_human)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = mst_human_s)) + geom_histogram()
 
@@ -75,6 +80,28 @@ data |>
   scale_fill_viridis(discrete = TRUE) +
   theme_minimal() +
   labs(y = "E. coli highest single sample (CFU / 100 mL)", x = "Beach") + 
+  theme(legend.position = "none")
+
+# Examine enterococci results
+
+data |>
+  filter(site != "Toronto") |> 
+  ggplot(aes(x = beach, y = entero_cce, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "Enterococcus geometric mean (CCE / 100 mL)", x = "Beach") + 
+  theme(legend.position = "none")
+
+data |>
+  filter(site != "Toronto") |> 
+  ggplot(aes(x = beach, y = entero_cce_max, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "Enterococcus highest single sample (CCE / 100 mL)", x = "Beach") + 
   theme(legend.position = "none")
 
 # Examine MST results

@@ -15,12 +15,17 @@ data_TO <- import(here("Datasets", "Toronto", "data_TO.csv"))
 data_VAN <- import(here("Datasets", "Vancouver", "data_VAN.csv"))
 data_MB <- import(here("Datasets", "Manitoba", "data_MB.csv"))
 
+data_NS <- import(here("Datasets", "Halifax", "data_NS.csv"))
+data_NR <- import(here("Datasets", "Niagara", "data_NR.csv"))
+
 e_coli_TO <- import(here("Datasets", "Toronto", "2023_e_coli.xlsx"))
 mst_TO <- import(here("Datasets", "Toronto", "2023_mst_data.xlsx"))
 
-e_coli_VAN <- import(here("Datasets", "Vancouver", "2024-e_coli_Vancouver.xlsx"))
+e_coli_VAN <- import(here("Datasets", "Vancouver", "2024-FIB_Vancouver.xlsx"))
+e_coli_MB <- import(here("Datasets", "Manitoba", "2024-FIB_Manitoba.xlsx"))
 
-e_coli_MB <- import(here("Datasets", "Manitoba", "2024-e_coli_Manitoba.xlsx"))
+e_coli_NS <- import(here("Datasets", "Halifax", "2025-FIB_Halifax.xlsx"))
+e_coli_NR <- import(here("Datasets", "Niagara", "2025-FIB_Niagara.xlsx"))
 
 ## TORONTO = Load, Format and Merge E. coli data
 # For now, reformat <10 E. coli to 5 counts to allow averaging and merging with other sites
@@ -96,7 +101,7 @@ data_TO <- left_join(data_TO, mst_TO, by = "date")
 
 remove(e_coli_TO, mst_TO)
 
-data_TO |> export(here("Datasets", "Toronto", "data_TO.csv"))
+data_TO |> export(here("Datasets", "Toronto", "data_TO_FIB.csv"))
 
 
 ## MANITOBA = Load, Format and Merge Lab Results
@@ -118,6 +123,16 @@ e_coli_MB <- e_coli_MB |> rowwise() |>
 e_coli_MB <- e_coli_MB |> rowwise() |>
   mutate(e_coli_min = min(c(e_coli1, e_coli2)))
 
+e_coli_MB <- e_coli_MB |> 
+  mutate(entero_cce1 = ifelse(entero_cce1 == 0, 1, as.numeric(entero_cce1)),
+         entero_cce2 = ifelse(entero_cce2 == 0, 1, as.numeric(entero_cce2)))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(entero_cce = exp(mean(log(c(entero_cce1, entero_cce2)), na.rm = TRUE))) 
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(entero_cce_max = max(c(entero_cce1, entero_cce2), na.rm = TRUE))
+
 data_MB <- data_MB |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d"))
 
@@ -125,7 +140,7 @@ data_MB <- left_join(data_MB, e_coli_MB, by = "date")
 
 remove(e_coli_MB)
 
-data_MB |> export(here("Datasets", "Manitoba", "data_MB.csv"))
+data_MB |> export(here("Datasets", "Manitoba", "data_MB_FIB.csv"))
 
 
 ## VANCOUVER = Load, Format and Merge Lab Results
@@ -146,6 +161,16 @@ e_coli_VAN <- e_coli_VAN |> rowwise() |>
 e_coli_VAN <- e_coli_VAN |> rowwise() |>
   mutate(e_coli_min = min(c(e_coli1, e_coli2)))
 
+e_coli_VAN <- e_coli_VAN |> 
+  mutate(entero_cce1 = ifelse(entero_cce1 == 0, 1, as.numeric(entero_cce1)),
+         entero_cce2 = ifelse(entero_cce2 == 0, 1, as.numeric(entero_cce2)))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(entero_cce = exp(mean(log(c(entero_cce1, entero_cce2)), na.rm = TRUE))) 
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(entero_cce_max = max(c(entero_cce1, entero_cce2), na.rm = TRUE))
+
 data_VAN <- data_VAN |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d"))
 
@@ -153,5 +178,5 @@ data_VAN <- left_join(data_VAN, e_coli_VAN, by = "date")
 
 remove(e_coli_VAN)
 
-data_VAN |> export(here("Datasets", "Vancouver", "data_VAN.csv"))
+data_VAN |> export(here("Datasets", "Vancouver", "data_VAN_FIB.csv"))
 

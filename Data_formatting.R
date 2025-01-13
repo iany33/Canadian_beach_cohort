@@ -16,9 +16,9 @@ pacman::p_load(
 
 # Combine data from across sites/regions
 
-data_VAN <- import(here("Datasets", "Vancouver", "data_VAN.csv"))
-data_MB <- import(here("Datasets", "Manitoba", "data_MB.csv"))
-data_TO <- import(here("Datasets", "Toronto", "data_TO.csv"))
+data_VAN <- import(here("Datasets", "Vancouver", "data_VAN_FIB.csv"))
+data_MB <- import(here("Datasets", "Manitoba", "data_MB_FIB.csv"))
+data_TO <- import(here("Datasets", "Toronto", "data_TO_FIB.csv"))
 
 data_MB <- data_MB |> mutate(ethnicity_indigenous = as.factor(ethnicity_indigenous))
 
@@ -551,10 +551,12 @@ house_size_tab <- data |> group_by(house_id) |>
 data <- data |> 
   group_by(house_id) |> 
   mutate(household_group = +(n() >1)) |> 
-  mutate(household_group = recode(household_group, 0 = "No", 1 = "Yes")) |> 
   ungroup() 
+
+data <- data |> 
+  mutate(household_group = ifelse(household_group == 0, "No", "Yes"))
     
-# Create mean centered and standardized E. coli and other water variables
+# Create logged and mean centered and standardized FIB and other water variables
 
 data <- data |> 
   mutate(log_e_coli = log(e_coli + 1))
@@ -563,10 +565,34 @@ data <- data |>
   mutate(log_e_coli_s = (log_e_coli - mean(log_e_coli, na.rm = TRUE)) / sd(log_e_coli, na.rm = TRUE))
 
 data <- data |> 
+  mutate(log_e_coli_max = log(e_coli_max + 1))
+
+data <- data |> 
+  mutate(log_e_coli_max_s = (log_e_coli_max - mean(log_e_coli_max, na.rm = TRUE)) / sd(log_e_coli_max, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_entero = log(entero_cce + 1))
+
+data <- data |> 
+  mutate(log_entero_s = (log_entero_cce - mean(log_entero_cce, na.rm = TRUE)) / sd(log_entero_cce, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_entero_max = log(entero_cce_max + 1))
+
+data <- data |> 
+  mutate(log_entero_max_s = (log_entero_max - mean(log_entero_max, na.rm = TRUE)) / sd(log_entero_max, na.rm = TRUE))
+
+data <- data |> 
   mutate(e_coli_s = (e_coli - mean(e_coli, na.rm = TRUE)) / sd(e_coli, na.rm = TRUE))
 
 data <- data |> 
   mutate(e_coli_max_s = (e_coli_max - mean(e_coli_max, na.rm = TRUE)) / sd(e_coli_max, na.rm = TRUE))
+
+data <- data |> 
+  mutate(entero_s = (entero_cce - mean(e_coli, na.rm = TRUE)) / sd(entero_cce, na.rm = TRUE))
+
+data <- data |> 
+  mutate(entero_max_s = (entero_cce_max - mean(entero_cce_max, na.rm = TRUE)) / sd(entero_cce_max, na.rm = TRUE))
 
 data <- data |> 
   mutate(mst_human_s = (mst_human - mean(mst_human, na.rm = TRUE)) / sd(mst_human, na.rm = TRUE))
@@ -600,20 +626,14 @@ data <- data |> mutate(ecoli_thresholds = factor(ecoli_thresholds, ordered = T,
                      levels = c("<=10", "11-100", "101-200", "201-300", "301-400", 
                                 "401-500", "501-1000", ">1000")))
                            
-# Create standardized and binary MST variables
+# Create binary MST variables
 
 data <- data |> 
-  mutate(mst_human_s = (mst_human - mean(mst_human, na.rm=TRUE)) / sd(mst_human, na.rm=TRUE))
-
-data <- data |> 
-  mutate(mst_gull_s = (mst_gull - mean(mst_gull, na.rm=TRUE)) / sd(mst_gull, na.rm=TRUE))
-
-data <- data |> 
-  mutate(mst_human2 = case_when(
+  mutate(mst_human_yn = case_when(
     mst_human > 0 ~ "Yes", TRUE ~ "No"))
 
 data <- data |> 
-  mutate(mst_gull2 = case_when(
+  mutate(mst_gull_yn = case_when(
   mst_gull > 0 ~ "Yes", TRUE ~ "No"))
 
 # Extract year as factor
