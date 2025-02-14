@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+.RDataTmp
 Datasets/
 Descriptive_analysis_report.pdf

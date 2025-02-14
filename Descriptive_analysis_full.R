@@ -82,6 +82,16 @@ data |>
   labs(y = "E. coli highest single sample (CFU / 100 mL)", x = "Beach") + 
   theme(legend.position = "none")
 
+data |>
+  ggplot(aes(x = beach, y = e_coli_max, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "E. coli highest single sample (CFU / 100 mL)", x = "Beach") + 
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log", breaks=c(10, 50, 100, 500, 1000))
+
 # Examine enterococci results
 
 data |>
@@ -130,14 +140,15 @@ data_follow |>
   facet_grid(~water_contact2)
 
 data_follow |> 
-  ggplot(aes(x = agi3, y = log_e_coli, fill = agi3)) +
+  ggplot(aes(x = agi3, y = e_coli, fill = agi3)) +
   geom_violin() +
   geom_boxplot(width = 0.1) +
   theme(legend.position = "none") +
   scale_fill_viridis_d(option = "cividis") +
   labs(x = "Acute gastrointestinal illness (AGI)",
-       y = "Log E. coli geometric mean") +
-  facet_grid(~water_contact2)
+       y = "E. coli geometric mean") +
+  facet_grid(~water_contact2)  +
+  scale_y_continuous(trans="log", breaks=c(10, 50, 100, 500, 1000))
 
 data_follow |> 
   ggplot(aes(x = agi3, y = e_coli_max, fill = agi3)) +
@@ -148,6 +159,28 @@ data_follow |>
   labs(x = "Acute gastrointestinal illness (AGI)",
        y = "E. coli highest single sample") +
   facet_grid(~water_contact2)
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = e_coli_max, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "E. coli highest single sample (plotted on log scale)") +
+  facet_grid(~water_contact2) +
+  scale_y_continuous(trans="log", breaks=c(10, 50, 100, 500, 1000))
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = entero_cce_max,, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "Enterococcus highest single sample (CCE / 100 mL, plotted on log scale)") +
+  facet_grid(~water_contact2) +
+  scale_y_continuous(trans="log", breaks=c(20, 100, 500, 1000, 8000))
 
 data_follow |> 
   ggplot(aes(x = agi3, y = mst_human, fill = agi3)) +

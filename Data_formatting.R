@@ -574,7 +574,7 @@ data <- data |>
   mutate(log_entero = log(entero_cce + 1))
 
 data <- data |> 
-  mutate(log_entero_s = (log_entero_cce - mean(log_entero_cce, na.rm = TRUE)) / sd(log_entero_cce, na.rm = TRUE))
+  mutate(log_entero_s = (log_entero - mean(log_entero, na.rm = TRUE)) / sd(log_entero, na.rm = TRUE))
 
 data <- data |> 
   mutate(log_entero_max = log(entero_cce_max + 1))
