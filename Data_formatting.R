@@ -595,10 +595,40 @@ data <- data |>
   mutate(entero_max_s = (entero_cce_max - mean(entero_cce_max, na.rm = TRUE)) / sd(entero_cce_max, na.rm = TRUE))
 
 data <- data |> 
-  mutate(mst_human_s = (mst_human - mean(mst_human, na.rm = TRUE)) / sd(mst_human, na.rm = TRUE))
+  mutate(log_mst_human = log(mst_human + 1))
 
 data <- data |> 
-  mutate(mst_gull_s = (mst_gull - mean(mst_gull, na.rm = TRUE)) / sd(mst_gull, na.rm = TRUE))
+  mutate(log_mst_human_s = (log_mst_human - mean(log_mst_human, na.rm = TRUE)) / sd(log_mst_human, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_mst_human_max = log(mst_human_max + 1))
+
+data <- data |> 
+  mutate(log_mst_human_max_s = (log_mst_human_max - mean(log_mst_human_max, na.rm = TRUE)) / sd(log_mst_human_max, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_mst_human_mt = log(mst_human_mt + 1))
+
+data <- data |> 
+  mutate(log_mst_human_mt_s = (log_mst_human_mt - mean(log_mst_human_mt, na.rm = TRUE)) / sd(log_mst_human_mt, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_mst_human_mt_max = log(mst_human_mt_max + 1))
+
+data <- data |> 
+  mutate(log_mst_human_mt_max_s = (log_mst_human_mt_max - mean(log_mst_human_mt_max, na.rm = TRUE)) / sd(log_mst_human_mt_max, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_mst_gull = log(mst_gull + 1))
+
+data <- data |> 
+  mutate(log_mst_gull_s = (log_mst_gull - mean(log_mst_gull, na.rm = TRUE)) / sd(log_mst_gull, na.rm = TRUE))
+
+data <- data |> 
+  mutate(log_mst_gull_max = log(mst_gull_max + 1))
+
+data <- data |> 
+  mutate(log_mst_gull_max_s = (log_mst_gull_max - mean(log_mst_gull_max, na.rm = TRUE)) / sd(log_mst_gull_max, na.rm = TRUE))
 
 data <- data |> 
   mutate(turbidity_s = (turbidity - mean(turbidity, na.rm = TRUE)) / sd(turbidity, na.rm = TRUE))
@@ -630,11 +660,24 @@ data <- data |> mutate(ecoli_thresholds = factor(ecoli_thresholds, ordered = T,
 
 data <- data |> 
   mutate(mst_human_yn = case_when(
-    mst_human > 0 ~ "Yes", TRUE ~ "No"))
+    mst_human == 0 ~ 0, mst_human > 0 ~ 1))
+
+data <- data |> 
+  mutate(mst_human_mt_yn = case_when(
+    mst_human_mt == 0 ~ 0, mst_human_mt > 0 ~ 1))
 
 data <- data |> 
   mutate(mst_gull_yn = case_when(
-  mst_gull > 0 ~ "Yes", TRUE ~ "No"))
+  mst_gull == 0 ~ 0, mst_gull > 0 ~ 1))
+
+data <- data |> 
+  mutate(mst_goose_yn = case_when(
+    mst_goose == 0 ~ 0, mst_goose > 0 ~ 1))
+
+data |> distinct(date, mst_human_yn, site) |> tabyl(mst_human_yn, site)
+data |> distinct(date, mst_human_mt_yn, site) |> tabyl(mst_human_mt_yn, site)
+data |> distinct(date, mst_gull_yn, site) |> tabyl(mst_gull_yn, site)
+data |> distinct(date, mst_goose_yn, site) |> tabyl(mst_goose_yn, site)
 
 # Extract year as factor
 

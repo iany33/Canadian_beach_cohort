@@ -88,18 +88,20 @@ mst_TO <- mst_TO |>
   mutate(HF183_human = as.numeric(HF183_human)) |> 
   mutate(Gull4_marker = as.numeric(Gull4_marker))
 
-mst_TO <- mst_TO |> 
+mst_TO2 <- mst_TO |> 
   group_by(date) |> 
   summarize(mst_human = mean(HF183_human),
-            mst_gull = mean(Gull4_marker)) |> 
+            mst_human_max = max(HF183_human),
+            mst_gull = mean(Gull4_marker),
+            mst_gull_max = max(Gull4_marker)) |> 
   ungroup()
 
-mst_TO <- mst_TO |> 
+mst_TO2 <- mst_TO2 |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
-data_TO <- left_join(data_TO, mst_TO, by = "date")
+data_TO <- left_join(data_TO, mst_TO2, by = "date")
 
-remove(e_coli_TO, mst_TO)
+remove(e_coli_TO, mst_TO, mst_TO2)
 
 data_TO |> export(here("Datasets", "Toronto", "data_TO_FIB.csv"))
 
@@ -115,7 +117,7 @@ e_coli_MB <- e_coli_MB |>
          e_coli2 = ifelse(e_coli2 == "<10", 5, as.numeric(e_coli2)))
 
 e_coli_MB <- e_coli_MB |> rowwise() |>
-  mutate(e_coli = exp(mean(log(c(e_coli1, e_coli2)), na.rm = TRUE)))
+  mutate(e_coli = mean(c(e_coli1, e_coli2), na.rm = TRUE))
 
 e_coli_MB <- e_coli_MB |> rowwise() |>
   mutate(e_coli_max = max(c(e_coli1, e_coli2)))
@@ -123,15 +125,35 @@ e_coli_MB <- e_coli_MB |> rowwise() |>
 e_coli_MB <- e_coli_MB |> rowwise() |>
   mutate(e_coli_min = min(c(e_coli1, e_coli2)))
 
-e_coli_MB <- e_coli_MB |> 
-  mutate(entero_cce1 = ifelse(entero_cce1 == 0, 1, as.numeric(entero_cce1)),
-         entero_cce2 = ifelse(entero_cce2 == 0, 1, as.numeric(entero_cce2)))
-
 e_coli_MB <- e_coli_MB |> rowwise() |>
-  mutate(entero_cce = exp(mean(log(c(entero_cce1, entero_cce2)), na.rm = TRUE))) 
+  mutate(entero_cce = mean(c(entero_cce1, entero_cce2), na.rm = TRUE))
 
 e_coli_MB <- e_coli_MB |> rowwise() |>
   mutate(entero_cce_max = max(c(entero_cce1, entero_cce2), na.rm = TRUE))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_human = mean(c(HF183_human1, HF183_human2), na.rm = TRUE))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_human_max = max(c(HF183_human1, HF183_human2)))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_human_mt = mean(c(Mt_human1, Mt_human2), na.rm = TRUE))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_human_mt_max = max(c(Mt_human1, Mt_human2)))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_gull = mean(c(Gull4_marker1, Gull4_marker2), na.rm = TRUE))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_gull_max = max(c(Gull4_marker1, Gull4_marker2)))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_goose = mean(c(Goose_marker1, Goose_marker2), na.rm = TRUE))
+
+e_coli_MB <- e_coli_MB |> rowwise() |>
+  mutate(mst_goose_max = max(c(Goose_marker1, Goose_marker2)))
 
 data_MB <- data_MB |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d"))
@@ -148,12 +170,8 @@ data_MB |> export(here("Datasets", "Manitoba", "data_MB_FIB.csv"))
 e_coli_VAN <- e_coli_VAN |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d")) 
 
-e_coli_VAN <- e_coli_VAN |> 
-  mutate(e_coli1 = ifelse(e_coli1 == 0, 1, as.numeric(e_coli1)),
-         e_coli2 = ifelse(e_coli2 == 0, 1, as.numeric(e_coli2)))
-
 e_coli_VAN <- e_coli_VAN |> rowwise() |>
-  mutate(e_coli = exp(mean(log(c(e_coli1, e_coli2)), na.rm = TRUE)))
+  mutate(e_coli = mean(c(e_coli1, e_coli2), na.rm = TRUE))
 
 e_coli_VAN <- e_coli_VAN |> rowwise() |>
   mutate(e_coli_max = max(c(e_coli1, e_coli2)))
@@ -161,15 +179,35 @@ e_coli_VAN <- e_coli_VAN |> rowwise() |>
 e_coli_VAN <- e_coli_VAN |> rowwise() |>
   mutate(e_coli_min = min(c(e_coli1, e_coli2)))
 
-e_coli_VAN <- e_coli_VAN |> 
-  mutate(entero_cce1 = ifelse(entero_cce1 == 0, 1, as.numeric(entero_cce1)),
-         entero_cce2 = ifelse(entero_cce2 == 0, 1, as.numeric(entero_cce2)))
-
 e_coli_VAN <- e_coli_VAN |> rowwise() |>
-  mutate(entero_cce = exp(mean(log(c(entero_cce1, entero_cce2)), na.rm = TRUE))) 
+  mutate(entero_cce = mean(c(entero_cce1, entero_cce2), na.rm = TRUE))
 
 e_coli_VAN <- e_coli_VAN |> rowwise() |>
   mutate(entero_cce_max = max(c(entero_cce1, entero_cce2), na.rm = TRUE))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_human = mean(c(HF183_human1, HF183_human2), na.rm = TRUE))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_human_max = max(c(HF183_human1, HF183_human2)))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_human_mt = mean(c(Mt_human1, Mt_human2), na.rm = TRUE))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_human_mt_max = max(c(Mt_human1, Mt_human2)))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_gull = mean(c(Gull4_marker1, Gull4_marker2), na.rm = TRUE))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_gull_max = max(c(Gull4_marker1, Gull4_marker2)))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_goose = mean(c(Goose_marker1, Goose_marker2), na.rm = TRUE))
+
+e_coli_VAN <- e_coli_VAN |> rowwise() |>
+  mutate(mst_goose_max = max(c(Goose_marker1, Goose_marker2)))
 
 data_VAN <- data_VAN |> 
   mutate(date = as.Date(date, format = "%Y-%m-%d"))

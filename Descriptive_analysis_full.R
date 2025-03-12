@@ -58,7 +58,15 @@ data |> group_by(date) |> ggplot(aes(x = log_entero)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = log_entero_s)) + geom_histogram()
 
 data |> group_by(date) |> ggplot(aes(x = mst_human)) + geom_histogram()
-data |> group_by(date) |> ggplot(aes(x = mst_human_s)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = log_mst_human)) + geom_histogram()
+
+data |> group_by(date) |> ggplot(aes(x = mst_human_mt)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = log_mst_human_mt)) + geom_histogram()
+
+data |> group_by(date) |> ggplot(aes(x = mst_gull)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = log_mst_gull)) + geom_histogram()
+
+data |> group_by(date) |> ggplot(aes(x = mst_goose)) + geom_histogram()
 
 data |> group_by(date) |> ggplot(aes(x = turbidity)) + geom_histogram()
 
@@ -117,7 +125,7 @@ data |>
 # Examine MST results
 
 data |> 
-  select(mst_human2, mst_gull2, date) |> 
+  select(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn, date) |> 
   distinct(date, .keep_all=TRUE) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1)),
               type = all_categorical() ~ "categorical")
@@ -298,14 +306,14 @@ data_follow |> select(agi3, ecoli_100, ecoli_200, ecoli_bav, ecoli_500, ecoli_10
               type = all_categorical() ~ "categorical")
 
 data_follow |> 
-  select(agi3, mst_human2) |> 
+  select(agi3, mst_human_yn) |> 
   tbl_summary(by = mst_human2, digits = list(all_categorical() ~ c(0, 1)),
               type = all_categorical() ~ "categorical")
 
 data_follow |> 
   filter(water_contact == "Yes") |> 
-  select(agi3, mst_human2) |> 
-  tbl_summary(by = mst_human2, digits = list(all_categorical() ~ c(0, 1)),
+  select(agi3, mst_human_yn) |> 
+  tbl_summary(by = mst_human_yn, digits = list(all_categorical() ~ c(0, 1)),
               type = all_categorical() ~ "categorical")
 
 data_follow |> 
@@ -441,8 +449,8 @@ data |>
   geom_point() +
   geom_smooth(method = "lm") 
 
-data |> distinct(date, mst_human, mst_gull, e_coli, rainfall_48hr, air_temp_mean, turbidity) |> 
-  select(mst_human, mst_gull, e_coli, rainfall_48hr, air_temp_mean, turbidity) |> 
+data |> distinct(date, mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, rainfall_48hr, air_temp_mean, turbidity) |> 
+  select(mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, rainfall_48hr, air_temp_mean, turbidity) |> 
   corrr::correlate()
 
 
