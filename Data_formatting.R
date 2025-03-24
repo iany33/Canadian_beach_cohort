@@ -193,6 +193,135 @@ data <- data |>
     TRUE ~ "No")) |>
   mutate(illness_any = as.factor(illness_any))
 
+# Create 3- and 5-day follow-up alternative outcomes
+
+data <- data |> 
+  mutate(agi_3day = case_when(
+    (symptoms_diar == "diarrhea" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    (symptoms_vomit == "vomiting" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    (symptoms_cramps == "cramps" & symptoms_naus == "nausea" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    (symptoms_cramps == "cramps" & symp_inc <=3 & symp_inc >=0 & misswork == 1) ~ 1,
+    (symptoms_naus == "nausea" & symp_inc <=3 & symp_inc >=0 & misswork == 1) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(agi_3day = case_when(
+    (agi_3day == 1 & base_agi == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(agi_3day = as.factor(agi_3day))
+
+data <- data |> 
+  mutate(agi_5day = case_when(
+    (symptoms_diar == "diarrhea" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    (symptoms_vomit == "vomiting" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    (symptoms_cramps == "cramps" & symptoms_naus == "nausea" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    (symptoms_cramps == "cramps" & symp_inc <=5 & symp_inc >=0 & misswork == 1) ~ 1,
+    (symptoms_naus == "nausea" & symp_inc <=5 & symp_inc >=0 & misswork == 1) ~ 1,
+    TRUE ~ 0))
+
+data <- data |> 
+  mutate(agi_5day = case_when(
+    (agi_5day == 1 & base_agi == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(agi_5day = as.factor(agi_5day))
+
+
+data <- data |> 
+  mutate(respiratory_3day = case_when(
+    (symptoms_cough == "cough" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    (symptoms_fever == "fever" & symptoms_throat == "throat" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    (symptoms_fever == "fever" & symptoms_nose == "nose" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(respiratory_3day = case_when(
+    (respiratory_3day == 1 & base_resp == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(respiratory_3day = as.factor(respiratory_3day))
+
+data <- data |> 
+  mutate(respiratory_5day = case_when(
+    (symptoms_cough == "cough" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    (symptoms_fever == "fever" & symptoms_throat == "throat" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    (symptoms_fever == "fever" & symptoms_nose == "nose" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(respiratory_5day = case_when(
+    (respiratory_5day == 1 & base_resp == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(respiratory_5day = as.factor(respiratory_5day))
+
+
+data <- data |> 
+  mutate(ear_infection_3day = case_when(
+    (symptoms_ear == "ear" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(ear_infection_3day = case_when(
+    (ear_infection_3day == 1 & base_ear == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(ear_infection_3day = as.factor(ear_infection_3day))
+
+data <- data |> 
+  mutate(ear_infection_5day = case_when(
+    (symptoms_ear == "ear" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(ear_infection_5day = case_when(
+    (ear_infection_5day == 1 & base_ear == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(ear_infection_5day = as.factor(ear_infection_5day))
+
+
+data <- data |> 
+  mutate(eye_infection_3day = case_when(
+    (symptoms_eye == "eye" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(eye_infection_3day = case_when(
+    (eye_infection_3day == 1 & base_eye == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(eye_infection_3day = as.factor(eye_infection_3day))
+
+data <- data |> 
+  mutate(eye_infection_5day = case_when(
+    (symptoms_eye == "eye" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(eye_infection_5day = case_when(
+    (eye_infection_5day == 1 & base_eye == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(eye_infection_5day = as.factor(eye_infection_5day))
+
+
+data <- data |> 
+  mutate(skin_infection_3day = case_when(
+    (symptoms_rash == "rash" & symp_inc <=3 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(skin_infection_3day = case_when(
+    (skin_infection_3day == 1 & base_skin == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(skin_infection_3day = as.factor(skin_infection_3day))
+
+data <- data |> 
+  mutate(skin_infection_5day = case_when(
+    (symptoms_rash == "rash" & symp_inc <=5 & symp_inc >=0) ~ 1,
+    TRUE ~ 0)) 
+
+data <- data |> 
+  mutate(skin_infection_5day = case_when(
+    (skin_infection_5day == 1 & base_skin == 0) ~ "Yes",
+    TRUE ~ "No")) |>
+  mutate(skin_infection_5day = as.factor(skin_infection_5day))
+
+
 # Convert various variables from text and NA to 1/0 entries
 
 data <- data |> mutate(cond_GI = case_when(cond_GI == "GI" ~ "Yes", TRUE ~ "No")) |>
@@ -692,3 +821,7 @@ data_follow <- data |> filter(follow == "Yes")
 # Export data
 
 data |> export(here("Datasets", "data.xlsx"))
+
+
+
+
