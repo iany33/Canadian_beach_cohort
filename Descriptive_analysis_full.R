@@ -7,7 +7,8 @@ pacman::p_load(
   rstatix, 
   janitor, 
   flextable,
-  viridis
+  viridis,
+  ggcorrplot
 )
 
 # Descriptive cross-tabs
@@ -44,6 +45,15 @@ old <- options(pillar.sigfig = 5)
 data |> 
   distinct(recruit_date, .keep_all=TRUE) |> 
   get_summary_stats(e_coli, e_coli_max, turbidity) 
+
+
+data |> distinct(recruit_date, .keep_all = TRUE) |>  
+  select(mst_human_yn, mst_human_mt_yn, mst_goose_yn, mst_gull_yn, site) |> 
+  tbl_summary(by = site, digits = list(all_categorical() ~ c(0, 1)),
+              type   = all_categorical() ~ "categorical", 
+              missing_text = "Missing") |> 
+  as_flex_table() 
+
   
 # Histograms
 
@@ -125,10 +135,61 @@ data |>
 # Examine MST results
 
 data |> 
-  select(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn, date) |> 
-  distinct(date, .keep_all=TRUE) |> 
+  select(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn, recruit_date) |> 
+  distinct(recruit_date, .keep_all=TRUE) |> 
   tbl_summary(digits = list(all_categorical() ~ c(0, 1)),
-              type = all_categorical() ~ "categorical")
+              type = all_categorical() ~ "categorical",
+              include = c(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn))
+
+data |> 
+  select(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn, site, recruit_date) |> 
+  distinct(recruit_date, .keep_all=TRUE) |> 
+  tbl_summary(by = site, digits = list(all_categorical() ~ c(0, 1)),
+              type = all_categorical() ~ "categorical",
+              include = c(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn))
+
+
+data |>
+  ggplot(aes(x = beach, y = mst_human_max, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "HF183 human sewage marker (DNA / 100mL)", x = "Beach") + 
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log")
+
+data |>
+  ggplot(aes(x = beach, y = mst_human_mt_max, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "Human mitochondrial marker (DNA / 100mL)", x = "Beach") + 
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log")
+
+data |>
+  ggplot(aes(x = beach, y = mst_gull_max, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "Seagull marker (DNA / 100mL)", x = "Beach") + 
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log")
+
+data |>
+  ggplot(aes(x = beach, y = mst_goose_max, fill = beach)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "Canada goose marker (DNA / 100mL)", x = "Beach") + 
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log")
+
+
 
 # Examine dose-response for water contact and AGI outcome
 
@@ -449,14 +510,52 @@ data |>
   geom_point() +
   geom_smooth(method = "lm") 
 
-data |> distinct(date, mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, rainfall_48hr, air_temp_mean, turbidity) |> 
+data |> distinct(date, mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce, 
+                 rainfall_48hr, air_temp_mean, turbidity) |> 
   select(mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, rainfall_48hr, air_temp_mean, turbidity) |> 
   corrr::correlate()
 
+corr <- data |> distinct(date, mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce) |> 
+  select(mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce) |> 
+  corrr::correlate()  
 
-data |> distinct(date, e_coli, turbidity) |> 
-  select(e_coli, turbidity) |> 
-  corrr::correlate()
+# Correlation matrix plots
+
+corr <- data |> distinct(date, mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce) |> 
+  select(mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce) 
+corr <- round(cor(corr, use = "pairwise.complete.obs"), 1)
+
+ggcorrplot(
+  corr,
+  hc.order = TRUE,
+  type = "lower",
+  outline.color = "white",
+  ggtheme = ggplot2::theme_gray,
+  colors = c("#6D9EC1", "white", "#E46726"))
 
 
+pacman::p_load(GGally)
+
+corr <- data |> distinct(date, mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce) |> 
+  select(mst_human, mst_human_mt, mst_gull, mst_goose, e_coli, entero_cce) 
+
+ggpairs(corr) 
+
+corr <- data |> distinct(date, log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) |> 
+  select(log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) 
+
+ggpairs(corr) 
+
+corr <- data |> 
+  filter(site != "Toronto") |> 
+  distinct(date, log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) |> 
+  select(log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) 
+
+ggpairs(corr) 
+
+
+
+
+
+ggpairs(corr) 
 

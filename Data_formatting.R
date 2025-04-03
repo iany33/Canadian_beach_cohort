@@ -760,6 +760,12 @@ data <- data |>
   mutate(log_mst_gull_max_s = (log_mst_gull_max - mean(log_mst_gull_max, na.rm = TRUE)) / sd(log_mst_gull_max, na.rm = TRUE))
 
 data <- data |> 
+  mutate(log_mst_goose = log(mst_goose + 1))
+
+data <- data |> 
+  mutate(log_mst_goose_max = log(mst_goose_max + 1))
+
+data <- data |> 
   mutate(turbidity_s = (turbidity - mean(turbidity, na.rm = TRUE)) / sd(turbidity, na.rm = TRUE))
 
 # Create E. coli threshold variables
