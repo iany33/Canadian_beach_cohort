@@ -86,14 +86,20 @@ mst_TO <- mst_TO |>
   mutate(date = as.Date(date, format = "%Y-%m-%d")) |> 
   mutate_all(function(x) gsub("BD", 0, x)) |> 
   mutate(HF183_human = as.numeric(HF183_human)) |> 
-  mutate(Gull4_marker = as.numeric(Gull4_marker))
+  mutate(Gull4_marker = as.numeric(Gull4_marker)) |> 
+  mutate(Mt_human = as.numeric(Mt_human)) |> 
+  mutate(Goose_marker = as.numeric(Goose_marker))
 
 mst_TO2 <- mst_TO |> 
   group_by(date) |> 
   summarize(mst_human = mean(HF183_human),
             mst_human_max = max(HF183_human),
             mst_gull = mean(Gull4_marker),
-            mst_gull_max = max(Gull4_marker)) |> 
+            mst_gull_max = max(Gull4_marker),  
+            mst_human_mt = mean(Mt_human),
+            mst_human_mt_max = max(Mt_human), 
+            mst_goose = mean(Goose_marker),
+            mst_goose_max = max(Goose_marker)) |> 
   ungroup()
 
 mst_TO2 <- mst_TO2 |> 

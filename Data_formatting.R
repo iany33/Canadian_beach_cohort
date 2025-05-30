@@ -768,6 +768,12 @@ data <- data |>
 data <- data |> 
   mutate(turbidity_s = (turbidity - mean(turbidity, na.rm = TRUE)) / sd(turbidity, na.rm = TRUE))
 
+data <- data |> 
+  mutate(log_turbidity = log(turbidity + 1))
+
+data <- data |> 
+  mutate(log_turbidity_s = (log_turbidity - mean(log_turbidity, na.rm = TRUE)) / sd(log_turbidity, na.rm = TRUE))
+
 # Create E. coli threshold variables
 
 data <- data |> 

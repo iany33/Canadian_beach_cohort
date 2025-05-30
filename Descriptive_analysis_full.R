@@ -47,14 +47,6 @@ data |>
   get_summary_stats(e_coli, e_coli_max, turbidity) 
 
 
-data |> distinct(recruit_date, .keep_all = TRUE) |>  
-  select(mst_human_yn, mst_human_mt_yn, mst_goose_yn, mst_gull_yn, site) |> 
-  tbl_summary(by = site, digits = list(all_categorical() ~ c(0, 1)),
-              type   = all_categorical() ~ "categorical", 
-              missing_text = "Missing") |> 
-  as_flex_table() 
-
-  
 # Histograms
 
 data |> group_by(date) |> ggplot(aes(x = e_coli)) + geom_histogram()
@@ -79,6 +71,7 @@ data |> group_by(date) |> ggplot(aes(x = log_mst_gull)) + geom_histogram()
 data |> group_by(date) |> ggplot(aes(x = mst_goose)) + geom_histogram()
 
 data |> group_by(date) |> ggplot(aes(x = turbidity)) + geom_histogram()
+data |> group_by(date) |> ggplot(aes(x = log_turbidity)) + geom_histogram()
 
 # Examine E. coli results by beach
 
@@ -148,6 +141,12 @@ data |>
               type = all_categorical() ~ "categorical",
               include = c(mst_human_yn, mst_human_mt_yn, mst_gull_yn, mst_goose_yn))
 
+data |> distinct(recruit_date, .keep_all = TRUE) |>  
+  select(mst_human_yn, mst_human_mt_yn, mst_goose_yn, mst_gull_yn, beach) |> 
+  tbl_summary(by = beach, digits = list(all_categorical() ~ c(0, 1)),
+              type   = all_categorical() ~ "categorical", 
+              missing_text = "Missing") |> 
+  as_flex_table() 
 
 data |>
   ggplot(aes(x = beach, y = mst_human_max, fill = beach)) +
@@ -241,6 +240,16 @@ data_follow |>
   scale_y_continuous(trans="log", breaks=c(10, 50, 100, 500, 1000))
 
 data_follow |> 
+  ggplot(aes(x = agi3, y = log_e_coli_max, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "Log E. coli highest single sample") +
+  facet_grid(~water_contact2)
+
+data_follow |> 
   ggplot(aes(x = agi3, y = entero_cce_max,, fill = agi3)) +
   geom_violin() +
   geom_boxplot(width = 0.1) +
@@ -289,7 +298,17 @@ data_follow |>
   scale_fill_viridis_d(option = "cividis") +
   labs(x = "Acute gastrointestinal illness (AGI)",
        y = "Water Turbidity" ) +
-  facet_wrap(~water_contact2)
+  facet_drid(~water_contact2)
+
+data_follow |> 
+  ggplot(aes(x = agi3, y = log_turbidity, fill = agi3)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(option = "cividis") +
+  labs(x = "Acute gastrointestinal illness (AGI)",
+       y = "Water Turbidity" ) +
+  facet_grid(~water_contact2)
 
 data_follow |> 
   filter(water_contact == "Yes") |> 
@@ -529,6 +548,21 @@ ggcorrplot(
   corr,
   hc.order = TRUE,
   type = "lower",
+  lab = TRUE,
+  outline.color = "white",
+  ggtheme = ggplot2::theme_gray,
+  colors = c("#6D9EC1", "white", "#E46726"))
+
+
+corr <- data |> distinct(date, log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) |> 
+  select(log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) 
+corr <- round(cor(corr, use = "pairwise.complete.obs"), 1)
+
+ggcorrplot(
+  corr,
+  hc.order = TRUE,
+  type = "lower",
+  lab = TRUE,
   outline.color = "white",
   ggtheme = ggplot2::theme_gray,
   colors = c("#6D9EC1", "white", "#E46726"))
@@ -550,12 +584,6 @@ corr <- data |>
   filter(site != "Toronto") |> 
   distinct(date, log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) |> 
   select(log_mst_human, log_mst_human_mt, log_mst_gull, log_mst_goose, log_e_coli, log_entero) 
-
-ggpairs(corr) 
-
-
-
-
 
 ggpairs(corr) 
 
