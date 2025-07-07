@@ -16,13 +16,21 @@ pacman::p_load(
 
 # Combine data from across sites/regions
 
+data_NR <- import(here("Datasets", "Niagara", "data_NR_FIB.csv"))
+data_NS <- import(here("Datasets", "Halifax", "data_NS_FIB.csv"))
 data_VAN <- import(here("Datasets", "Vancouver", "data_VAN_FIB.csv"))
 data_MB <- import(here("Datasets", "Manitoba", "data_MB_FIB.csv"))
 data_TO <- import(here("Datasets", "Toronto", "data_TO_FIB.csv"))
 
 data_MB <- data_MB |> mutate(ethnicity_indigenous = as.factor(ethnicity_indigenous))
 
-data <- bind_rows(data_MB, data_VAN, data_TO)
+data_VAN <- data_VAN |> 
+  mutate(e_coli_hu1 = as.character(e_coli_hu1)) |> 
+  mutate(e_coli_hu2 = as.character(e_coli_hu2)) |> 
+  mutate(e_coli_hu3 = as.character(e_coli_hu3)) |> 
+  mutate(e_coli_hu4 = as.character(e_coli_hu4)) 
+
+data <- bind_rows(data_NR, data_NS, data_MB, data_VAN, data_TO)
 
 # Create variable to determine if follow-up was complete or not
 
@@ -833,6 +841,10 @@ data_follow <- data |> filter(follow == "Yes")
 # Export data
 
 data |> export(here("Datasets", "data.xlsx"))
+
+# Remove site datasets
+
+remove(data_NR, data_NS, data_MB, data_VAN, data_TO)
 
 
 

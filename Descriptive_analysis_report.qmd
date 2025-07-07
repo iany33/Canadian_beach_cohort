@@ -9,6 +9,7 @@ editor: visual
 
 ```{r}
 #| echo: false
+#| warning: false
 pacman::p_load(
   rio,
   here,
@@ -43,7 +44,7 @@ Among `r num_eligiblehouse_follow` households and `r num_eligible_follow` indivi
 
 ```{r}
 #| echo: false
-data |> group_by(beach) |> select(beach, date, house_id) |> 
+data |> group_by(site, beach) |> select(site, beach, date, house_id) |> 
    summarize(Num_households = n_distinct(house_id),
              Num_participants = n(), 
              Num_days = n_distinct(date),
@@ -54,9 +55,9 @@ data |> group_by(beach) |> select(beach, date, house_id) |>
 
 ```{r}
 #| echo: false
-data |> group_by(beach) |> mutate(follow_date = ymd(Sys.Date())-ymd(date)) |> 
+data |> group_by(site, beach) |> mutate(follow_date = ymd(Sys.Date())-ymd(date)) |> 
   filter(follow_date >=8) |> 
-  select(beach, house_id, follow_date, follow) |> 
+  select(site, beach, house_id, follow_date, follow) |> 
   summarize(Num_households = n_distinct(house_id),
             Num_participants = n(),
             Response_rate = round(sum(follow=="Yes")/Num_participants*100, digits = 1))
@@ -104,7 +105,7 @@ data |>
 #| echo: false
 #| warning: false
 data |> 
-  filter(year == 2024) |> 
+  filter(year == 2025) |> 
   ggplot(aes(x = as.Date(date), y = e_coli, shape = beach, colour = beach)) +
   geom_point() +
   geom_errorbar(aes(ymin=e_coli_min, ymax=e_coli_max)) +
@@ -112,7 +113,7 @@ data |>
   labs(y = "E. coli levels (CFU / 100 mL)", x = "Recruitment date",
        shape = "Beach", colour = "Beach") +
   geom_hline(yintercept = 235, linetype = "dashed", alpha = 0.5) +
-  annotate("text", x = as.Date("2024-06-16"), y = 235, 
+  annotate("text", x = as.Date("2025-06-16"), y = 235, 
            label = "Beach Action Value", vjust = -0.5, size = 3.5) +
   theme(legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1))
 ```
@@ -145,7 +146,7 @@ data_follow |>
 
 ```{r}
 #| echo: false
-data_follow |>
+data_follow |> 
   select(agi3, respiratory3, ear_infection3, eye_infection3, skin_infection3, illness_any,
          water_contact) |> 
   tbl_summary(by = water_contact, digits = list(all_categorical() ~ c(0, 1))) |> 

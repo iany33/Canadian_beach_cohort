@@ -31,7 +31,7 @@ beach <- beach |>
   unite(sex1, c("sex", num_range("sex", 2:10)), sep=",") |>
   unite(sexother, ends_with("other_sex"), sep=",")  |>   
   unite(gender1, c("gender", num_range("gender", 2:10)), sep=",") |>
-  unite(gender_other, ends_with("other_gender"), sep=",") |>  
+  unite(genderother, ends_with("other_gender"), sep=",") |>  
   unite(ethnicity_arab, ends_with("arab"), sep=",") |> 
   unite(ethnicity_black, ends_with("black"), sep=",") |> 
   unite(ethnicity_se_asian, ends_with("southeast_asian"), sep=",") |> 
@@ -99,7 +99,7 @@ beach <- beach |>
   unite(others, starts_with("others"), sep=",")
 
 beach <- beach |> 
-  separate_rows(name1, age1, sex1, sexother, gender1, gender_other, ethnicity_arab, ethnicity_black, 
+  separate_rows(name1, age1, sex1, sexother, gender1, genderother, ethnicity_arab, ethnicity_black, 
                 ethnicity_east_asian, ethnicity_indigenous, ethnicity_latin, ethnicity_south_asian, 
                 ethnicity_se_asian, ethnicity_white, ethnicity_other, ethnicity_other_s, ethnicity_na, 
                 base_symp_diar, base_symp_vomit, base_symp_cramps, base_symp_naus, base_symp_fever, 

@@ -111,6 +111,8 @@ remove(e_coli_TO, mst_TO, mst_TO2)
 
 data_TO |> export(here("Datasets", "Toronto", "data_TO_FIB.csv"))
 
+remove(data_TO, e_coli_TO, mst_TO, mst_TO2)
+
 
 ## MANITOBA = Load, Format and Merge Lab Results
 # For now, reformat <10 E. coli to 5 counts to allow averaging and merging with other sites
@@ -166,10 +168,9 @@ data_MB <- data_MB |>
 
 data_MB <- left_join(data_MB, e_coli_MB, by = "date")
 
-remove(e_coli_MB)
-
 data_MB |> export(here("Datasets", "Manitoba", "data_MB_FIB.csv"))
 
+remove(data_MB, e_coli_MB)
 
 ## VANCOUVER = Load, Format and Merge Lab Results
 
@@ -220,7 +221,62 @@ data_VAN <- data_VAN |>
 
 data_VAN <- left_join(data_VAN, e_coli_VAN, by = "date")
 
-remove(e_coli_VAN)
-
 data_VAN |> export(here("Datasets", "Vancouver", "data_VAN_FIB.csv"))
+
+remove(data_VAN, e_coli_VAN)
+
+## NIAGARA results
+
+data_NR <- data_NR |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
+
+e_coli_NR <- e_coli_NR |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
+
+e_coli_NR <- e_coli_NR |> rowwise() |>
+  mutate(e_coli = mean(c(e_coli1, e_coli2), na.rm = TRUE))
+
+e_coli_NR <- e_coli_NR |> rowwise() |>
+  mutate(e_coli_max = max(c(e_coli1, e_coli2)))
+
+e_coli_NR <- e_coli_NR |> rowwise() |>
+  mutate(e_coli_min = min(c(e_coli1, e_coli2)))
+
+e_coli_NR <- e_coli_NR |> rowwise() |>
+  mutate(turbidity = mean(c(turbidity1, turbidity2), na.rm = TRUE))
+
+data_NR <- left_join(data_NR, e_coli_NR, by = "date")
+
+data_NR |> export(here("Datasets", "Niagara", "data_NR_FIB.csv"))
+
+remove(data_NR, e_coli_NR)
+
+
+## HALIFAX results
+
+data_NS <- data_NS |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
+
+e_coli_NS <- e_coli_NS |> 
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) 
+
+e_coli_NS <- e_coli_NS |> rowwise() |>
+  mutate(e_coli = mean(c(e_coli1, e_coli2), na.rm = TRUE))
+
+e_coli_NS <- e_coli_NS |> rowwise() |>
+  mutate(e_coli_max = max(c(e_coli1, e_coli2)))
+
+e_coli_NS <- e_coli_NS |> rowwise() |>
+  mutate(e_coli_min = min(c(e_coli1, e_coli2)))
+
+e_coli_NS <- e_coli_NS |> rowwise() |>
+  mutate(turbidity = mean(c(turbidity1, turbidity2), na.rm = TRUE))
+
+data_NS <- left_join(data_NS, e_coli_NS, by = "date")
+
+data_NS |> export(here("Datasets", "Halifax", "data_NS_FIB.csv"))
+
+remove(data_NS, e_coli_NS)
+
+
 
