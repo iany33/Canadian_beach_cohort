@@ -22,6 +22,8 @@ pacman::p_load(
 
 data <- import(here("Datasets", "data.xlsx"))
 
+data <- data |> filter(year==2025)
+
 num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
 num_participants <- data |> summarize(count = n())
 num_unique_participants <- data |> distinct(participant_id) |> summarize(count = n())
@@ -113,7 +115,7 @@ data |>
   labs(y = "E. coli levels (CFU / 100 mL)", x = "Recruitment date",
        shape = "Beach", colour = "Beach") +
   geom_hline(yintercept = 235, linetype = "dashed", alpha = 0.5) +
-  annotate("text", x = as.Date("2025-06-16"), y = 235, 
+  annotate("text", x = as.Date("2025-06-16"), y = 215, 
            label = "Beach Action Value", vjust = -0.5, size = 3.5) +
   theme(legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1))
 ```

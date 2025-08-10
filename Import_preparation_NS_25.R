@@ -40,8 +40,8 @@ beach <- beach |>
   unite(ethnicity_latin, ends_with("latin"), sep=",") |> 
   unite(ethnicity_south_asian, ends_with("south_asian"), sep=",") |> 
   unite(ethnicity_white, ends_with("white"), sep=",") |> 
-  unite(ethnicity_other, c("ethnicityother_eth_35", "ethnicity2other_eth_106", "ethnicity3other_eth_177", "ethnicity4other_eth_248", "ethnicity5other_eth_319", "ethnicity6other_eth_390", "ethnicity7other_eth_461", "ethnicity8other_eth_532", "ethnicity9other_eth_603", "ethnicity10other_eth_674"), sep=",") |> 
-  unite(ethnicity_other_s, c("ethnicityother_eth_36", "ethnicity2other_eth_107", "ethnicity3other_eth_178", "ethnicity4other_eth_249", "ethnicity5other_eth_320", "ethnicity6other_eth_391","ethnicity7other_eth_462", "ethnicity8other_eth_533", "ethnicity9other_eth_604", "ethnicity10other_eth_675"), sep=",") |>
+  unite(ethnicity_other, c("ethnicity_other_eth_35", "ethnicity2_other_eth_106", "ethnicity3_other_eth_177", "ethnicity4_other_eth_248", "ethnicity5_other_eth_319", "ethnicity6_other_eth_390", "ethnicity7_other_eth_461", "ethnicity8_other_eth_532", "ethnicity9_other_eth_603", "ethnicity10_other_eth_674"), sep=",") |> 
+  unite(ethnicity_other_s, c("ethnicity_other_eth_36", "ethnicity2_other_eth_107", "ethnicity3_other_eth_178", "ethnicity4_other_eth_249", "ethnicity5_other_eth_320", "ethnicity6_other_eth_391","ethnicity7_other_eth_462", "ethnicity8_other_eth_533", "ethnicity9_other_eth_604", "ethnicity10_other_eth_675"), sep=",") |>
   unite(ethnicity_na, matches("^ethnicity.*na$"), sep=",") |> 
   unite(base_symp_diar, ends_with("diarrhea"), sep=",") |> 
   unite(base_symp_vomit, ends_with("vomiting"), sep=",") |> 
@@ -79,8 +79,8 @@ beach <- beach |>
   unite(water_act_fish, ends_with("fish"), sep=",") |> 
   unite(water_act_canoe, ends_with("canoe"), sep=",") |> 
   unite(water_act_kayak, ends_with("kayak"), sep=",") |> 
-  unite(water_act_other, c("water_actother_74", "water_act2other_145", "water_act3other_216", "water_act4other_287", "water_act5other_358", "water_act6other_429", "water_act7other_500", "water_act8other_571", "water_act9other_642", "water_act10other_713"), sep=",") |>   
-  unite(water_act_other_s, c("water_actother_75", "water_act2other_146", "water_act3other_217", "water_act4other_288", "water_act5other_359", "water_act6other_430", "water_act7other_501", "water_act8other_572", "water_act9other_643", "water_act10other_714"), sep=",") |>  
+  unite(water_act_other, c("water_act_other_74", "water_act2_other_145", "water_act3_other_216", "water_act4_other_287", "water_act5_other_358", "water_act6_other_429", "water_act7_other_500", "water_act8_other_571", "water_act9_other_642", "water_act10_other_713"), sep=",") |>   
+  unite(water_act_other_s, c("water_act_other_75", "water_act2_other_146", "water_act3_other_217", "water_act4_other_288", "water_act5_other_359", "water_act6_other_430", "water_act7_other_501", "water_act8_other_572", "water_act9_other_643", "water_act10_other_714"), sep=",") |>  
   unite(water_exp_body, ends_with("face"), sep=",") |> 
   unite(water_exp_head, ends_with("head"), sep=",") |> 
   unite(water_exp_mouth, matches("^water_exp.*mouth$"), sep=",") |> 
@@ -93,8 +93,8 @@ beach <- beach |>
   unite(sand1, c("sand", num_range("sand", 2:10)), sep=",") |> 
   unite(sand_act_dig, ends_with("dig"), sep=",") |> 
   unite(sand_act_bury, ends_with("bury"), sep=",") |> 
-  unite(sand_act_other, c("sand_actother_89", "sand_act2other_160", "sand_act3other_231", "sand_act4other_302", "sand_act5other_373", "sand_act6other_444", "sand_act7other_515", "sand_act8other_586", "sand_act9other_657", "sand_act10other_728"), sep=",") |>   
-  unite(sand_act_other_s, c("sand_actother_90", "sand_act2other_161", "sand_act3other_232", "sand_act4other_303", "sand_act5other_374", "sand_act6other_445", "sand_act7other_516", "sand_act8other_587", "sand_act9other_658", "sand_act10other_729"), sep=",") |> 
+  unite(sand_act_other, c("sand_act_other_89", "sand_act2_other_160", "sand_act3_other_231", "sand_act4_other_302", "sand_act5_other_373", "sand_act6_other_444", "sand_act7_other_515", "sand_act8_other_586", "sand_act9_other_657", "sand_act10_other_728"), sep=",") |>   
+  unite(sand_act_other_s, c("sand_act_other_90", "sand_act2_other_161", "sand_act3_other_232", "sand_act4_other_303", "sand_act5_other_374", "sand_act6_other_445", "sand_act7_other_516", "sand_act8_other_587", "sand_act9_other_658", "sand_act10_other_729"), sep=",") |> 
   unite(sand_mouth1, starts_with("sand_mouth"), sep=",")  |> 
   unite(others, starts_with("others"), sep=",")
 
@@ -214,10 +214,23 @@ survey_data <- survey_data |>
 
 data_NS <- subset(survey_data, select = -c(email.x, email.y, phone))
 
+# Add beach variable
+
+data_NS <- data_NS |> 
+  mutate(beach = case_when(
+    (date == "2025-06-26" | date == "2025-07-02" | date == "2025-07-10" | date == "2025-07-14" |
+       date == "2025-07-15" | date == "2025-07-18" | date == "2025-07-24" | date == "2025-07-29" |
+       date == "2025-08-06") ~ "Kinsmen Beach",
+    TRUE ~ "Birch Cove Beach"))
+
+data_NS <- data_NS |> 
+  mutate(beach = replace(beach, row_id == 340, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 341, "Kinsmen Beach")) 
+
 # Create location-recruitment date variable
 
 data_NS <- data_NS |> 
-  mutate(recruit_date = paste("NS", date, sep = "_")) |> 
+  unite(recruit_date, c("beach", "date"), remove = FALSE, sep="_") |> 
   relocate(recruit_date, .after = date)
 
 # Remove unnecessary dataframes, save/export data

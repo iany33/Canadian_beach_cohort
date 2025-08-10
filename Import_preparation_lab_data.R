@@ -272,7 +272,7 @@ e_coli_NS <- e_coli_NS |> rowwise() |>
 e_coli_NS <- e_coli_NS |> rowwise() |>
   mutate(turbidity = mean(c(turbidity1, turbidity2), na.rm = TRUE))
 
-data_NS <- left_join(data_NS, e_coli_NS, by = "date")
+data_NS <- left_join(data_NS, e_coli_NS, by = c("date", "beach"))
 
 data_NS |> export(here("Datasets", "Halifax", "data_NS_FIB.csv"))
 
