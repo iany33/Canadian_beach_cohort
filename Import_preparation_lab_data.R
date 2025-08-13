@@ -274,6 +274,9 @@ e_coli_NS <- e_coli_NS |> rowwise() |>
 
 data_NS <- left_join(data_NS, e_coli_NS, by = c("date", "beach"))
 
+data_NS <- data_NS |> 
+  mutate(site = replace(site, is.na(site), "Halifax"))
+
 data_NS |> export(here("Datasets", "Halifax", "data_NS_FIB.csv"))
 
 remove(data_NS, e_coli_NS)

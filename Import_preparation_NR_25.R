@@ -170,6 +170,11 @@ survey_data <- survey_data |>
   mutate(month = as.factor(month(date))) |> 
   mutate(dow = as.factor(wday(date))) # Sunday is 1, Sat. is 7
 
+# Fix access/completion date issue with some respondents
+
+survey_data <- survey_data |> 
+  mutate(date = replace(date, as.Date(date) == "2025-08-09", as.Date("2025-08-08")))
+
 # Check for duplicate names 
 
 survey_data |> group_by(name1) |> filter(n()>1) |> select(house_id, date, name1, household_name, submitted_date.y)

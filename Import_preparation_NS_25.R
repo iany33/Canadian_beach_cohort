@@ -214,7 +214,7 @@ survey_data <- survey_data |>
 
 data_NS <- subset(survey_data, select = -c(email.x, email.y, phone))
 
-# Add beach variable
+# Add beach and site variable
 
 data_NS <- data_NS |> 
   mutate(beach = case_when(
