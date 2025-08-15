@@ -220,12 +220,20 @@ data_NS <- data_NS |>
   mutate(beach = case_when(
     (date == "2025-06-26" | date == "2025-07-02" | date == "2025-07-10" | date == "2025-07-14" |
        date == "2025-07-15" | date == "2025-07-18" | date == "2025-07-24" | date == "2025-07-29" |
-       date == "2025-08-06") ~ "Kinsmen Beach",
+       date == "2025-08-06" | date == "2025-08-08" | date == "2025-08-12") ~ "Kinsmen Beach",
     TRUE ~ "Birch Cove Beach"))
 
 data_NS <- data_NS |> 
+  mutate(beach = replace(beach, row_id == 337, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 338, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 339, "Kinsmen Beach")) |> 
   mutate(beach = replace(beach, row_id == 340, "Kinsmen Beach")) |> 
-  mutate(beach = replace(beach, row_id == 341, "Kinsmen Beach")) 
+  mutate(beach = replace(beach, row_id == 341, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 342, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 343, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 347, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 348, "Kinsmen Beach")) |> 
+  mutate(beach = replace(beach, row_id == 349, "Kinsmen Beach"))
 
 # Create location-recruitment date variable
 
