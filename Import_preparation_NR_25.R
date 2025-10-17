@@ -173,7 +173,12 @@ survey_data <- survey_data |>
 # Fix access/completion date issue with some respondents
 
 survey_data <- survey_data |> 
-  mutate(date = replace(date, as.Date(date) == "2025-08-09", as.Date("2025-08-08")))
+  mutate(date = replace(date, as.Date(date) == "2025-08-09", as.Date("2025-08-08"))) |> 
+  mutate(date = replace(date, as.Date(date) == "2025-08-18", as.Date("2025-08-17"))) |> 
+  mutate(date = replace(date, as.Date(date) == "2025-08-15", as.Date("2025-08-14")))|> 
+  mutate(date = replace(date, as.Date(date) == "2025-08-22", as.Date("2025-08-21")))|> 
+  mutate(date = replace(date, as.Date(date) == "2025-08-25", as.Date("2025-08-24")))
+  
 
 # Check for duplicate names 
 

@@ -22,8 +22,6 @@ pacman::p_load(
 
 data <- import(here("Datasets", "data.xlsx"))
 
-data <- data |> filter(year==2025)
-
 num_households <- data |> select(house_id) |> n_distinct() |> as_tibble()
 num_participants <- data |> summarize(count = n())
 num_unique_participants <- data |> distinct(participant_id) |> summarize(count = n())
@@ -46,10 +44,10 @@ Among `r num_eligiblehouse_follow` households and `r num_eligible_follow` indivi
 
 ```{r}
 #| echo: false
-data |> group_by(site, beach) |> select(site, beach, date, house_id) |> 
+data |> group_by(site, beach) |> select(site, beach, recruit_date, house_id) |> 
    summarize(Num_households = n_distinct(house_id),
              Num_participants = n(), 
-             Num_days = n_distinct(date),
+             Num_days = n_distinct(recruit_date),
              Participants_per_day = round(Num_participants/Num_days, digits = 1))
 ```
 

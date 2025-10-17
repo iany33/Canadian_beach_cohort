@@ -94,6 +94,15 @@ data |>
   theme(legend.position = "none")
 
 data |>
+  ggplot(aes(x = site, y = e_coli_max, fill = site)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "E. coli highest single sample (CFU / 100 mL)", x = "Site") + 
+  theme(legend.position = "none")
+
+data |>
   ggplot(aes(x = beach, y = e_coli_max, fill = beach)) +
   geom_violin() +
   geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
@@ -102,6 +111,32 @@ data |>
   labs(y = "E. coli highest single sample (CFU / 100 mL)", x = "Beach") + 
   theme(legend.position = "none") +
   scale_y_continuous(trans="log", breaks=c(10, 50, 100, 500, 1000))
+
+data |>
+  ggplot(aes(x = site, y = e_coli_max, fill = site)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "E. coli highest single sample (CFU / 100 mL)", x = "Site") + 
+  geom_hline(yintercept = 235, linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = 0.6, y = 235, 
+           label = "BAV", vjust = -0.5, size = 3.5) +
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log", breaks=c(10, 50, 100, 500, 1000))
+
+# Turbidity
+
+data |>
+  ggplot(aes(x = site, y = turbidity, fill = site)) +
+  geom_violin() +
+  geom_boxplot(width = 0.4, color="grey", alpha = 0.2) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal() +
+  labs(y = "Water Turbidity (NTUs)", x = "Site") + 
+  theme(legend.position = "none") +
+  scale_y_continuous(trans="log")
+
 
 # Examine enterococci results
 
@@ -187,7 +222,6 @@ data |>
   labs(y = "Canada goose marker (DNA / 100mL)", x = "Beach") + 
   theme(legend.position = "none") +
   scale_y_continuous(trans="log")
-
 
 
 # Examine dose-response for water contact and AGI outcome

@@ -32,6 +32,8 @@ data_VAN <- data_VAN |>
 
 data <- bind_rows(data_NR, data_NS, data_MB, data_VAN, data_TO)
 
+data <- data |> select(!gender_other:pet_participation_1)
+
 # Create variable to determine if follow-up was complete or not
 
 data  <- data  |> 
@@ -338,7 +340,7 @@ data <- data |> mutate(cond_GI = case_when(cond_GI == "GI" ~ "Yes", TRUE ~ "No")
 data <- data |> mutate(cond_resp = case_when(cond_resp == "respiratory" ~ "Yes", TRUE ~ "No")) |>
   mutate(cond_resp = as.factor(cond_resp))
 
-data <- data |> mutate(cond_skin = case_when(cond_skin == "cond_skin" ~ "Yes", TRUE ~ "No")) |>
+data <- data |> mutate(cond_skin = case_when(cond_skin == "skin" ~ "Yes", TRUE ~ "No")) |>
   mutate(cond_skin = as.factor(cond_skin))
 
 data <- data |> mutate(cond_allergy = case_when(cond_allergy == "allergies" ~ "Yes", TRUE ~ "No")) |>
@@ -708,13 +710,13 @@ data <- data |>
   mutate(log_e_coli_max_s = (log_e_coli_max - mean(log_e_coli_max, na.rm = TRUE)) / sd(log_e_coli_max, na.rm = TRUE))
 
 data <- data |> 
-  mutate(log_entero = log(entero_cce + 1))
+  mutate(log_entero = log(entero_cce)) 
 
 data <- data |> 
-  mutate(log_entero_s = (log_entero - mean(log_entero, na.rm = TRUE)) / sd(log_entero, na.rm = TRUE))
+  mutate(log_entero_s = (log_entero - mean(log_entero, na.rm = TRUE)) / sd(log_entero, na.rm = TRUE)) 
 
 data <- data |> 
-  mutate(log_entero_max = log(entero_cce_max + 1))
+  mutate(log_entero_max = log(entero_cce_max))
 
 data <- data |> 
   mutate(log_entero_max_s = (log_entero_max - mean(log_entero_max, na.rm = TRUE)) / sd(log_entero_max, na.rm = TRUE))

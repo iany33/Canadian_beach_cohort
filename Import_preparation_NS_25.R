@@ -220,7 +220,8 @@ data_NS <- data_NS |>
   mutate(beach = case_when(
     (date == "2025-06-26" | date == "2025-07-02" | date == "2025-07-10" | date == "2025-07-14" |
        date == "2025-07-15" | date == "2025-07-18" | date == "2025-07-24" | date == "2025-07-29" |
-       date == "2025-08-06" | date == "2025-08-08" | date == "2025-08-12") ~ "Kinsmen Beach",
+       date == "2025-08-06" | date == "2025-08-08" | date == "2025-08-12" | date == "2025-08-13" |
+       date == "2025-08-15" | date == "2025-08-18" | date == "2025-08-29") ~ "Kinsmen Beach",
     TRUE ~ "Birch Cove Beach"))
 
 data_NS <- data_NS |> 
